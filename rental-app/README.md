@@ -15,7 +15,9 @@ This smart contract offers the ability to tokenize properties and split them int
 - **Property price:** Price of each piece at the initial property offering 
     NOTE: Property price * total supply CAN'T exceed the value backup.
 
-
-
 ## **Bank**
+this smart contract establishes a direct connection between the Bank contract and the factoryProperty. Empowering users to claim their monthly yields,  As Envwise & Libertum creates new collections, the bank remains informed and efficiently distributes the yields to the investors associated with each property.
+
 ## **FactoryProperty**
+This smart contract facilitates the creation of new collections exclusively by Envwise & Libertum, allowing them to launch new properties for users while maintaining control over the creation process (currently limited to Envwise & Libertum).
+

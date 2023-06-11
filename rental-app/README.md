@@ -7,12 +7,12 @@ This repo have 3 main contracts:
 
 ## **Property**
 This smart contract offers the ability to tokenize properties and split them into unlimited pieces upon collection creation, while allowing customization of the following parameters when creating the collection:
-- Stablishing the type of investment of this property for the investors (1. Loans or 2. Passive income)
+- **Type of investment:**
     1. Loans: Fixed rate and fixed time.
     2. Passive income: Fixed rate with no fixed time.
-- Total supply: How many pieces can be sold
-- Value backup: Envwise & Libertum maintain a dedicated backup of the total value for each property, ensuring financial security and stability for the investors
-- Property price: Price of each piece at the initial property offering 
+- **Total supply:** How many pieces can be sold
+- **Value backup:** Envwise & Libertum maintain a dedicated backup of the total value for each property, ensuring financial security and stability for the investors
+- **Property price:** Price of each piece at the initial property offering 
     NOTE: Property price * total supply CAN'T exceed the value backup.
 
 

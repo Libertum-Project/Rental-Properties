@@ -1,6 +1,6 @@
 # Rental properties contracts
 
-This repo have 3 main contracts:
+This repo contains 3 main contracts:
 - Bank
 - FactoryProperty
 - Property

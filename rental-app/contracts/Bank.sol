@@ -34,6 +34,39 @@ contract Bank is AccessControl {
         _;
     }
 
+    function createNewPropertyLoan(
+        string memory _name,
+        string memory _symbol,
+        uint256 _totalSupply,
+        uint256 _initialPricePerPiece,
+        uint256 _valueBackup,
+        uint256 _duration,
+        uint256 _totalRate,
+        address _receiver
+    ) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        // Create new property (ERC20)
+        PropertyLoan property = new PropertyLoan(
+            _name,
+            _symbol,
+            _totalSupply,
+            _initialPricePerPiece,
+            _valueBackup,
+            _duration,
+            _totalRate,
+            _receiver,
+            address(this) 
+        );
+
+        // Calculate the monthly installment per piece
+        uint256 totalAmount = _valueBackup + _valueBackup * _totalRate / 100;
+        uint256 monthlyInstallments = totalAmount / _duration / _totalSupply;
+
+        // Register the property's properties
+        s_properties[address(property)].name = _name;
+        s_properties[address(property)].installmentPerPiece = monthlyInstallments;
+        s_properties[address(property)].isActive = true;
+    }
+
     /**
      * @dev This function will be called ONLY by the collections created by the factory contract
      * and it will register them in the bank after they have been sold out.

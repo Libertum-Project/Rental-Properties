@@ -11,7 +11,6 @@ contract Bank is AccessControl {
     // Edit this address when deploying on other networks with a different USDT address
     address private constant USDT_ADDRESS = 0x55d398326f99059fF775485246999027B3197955; // USDT(BSC)
     IERC20 constant USDT = IERC20(USDT_ADDRESS);
-    FactoryProperty private s_factoryContract; //only this contract will be able to register properties
     mapping (address => PropertyWithLoan) private s_properties;
 
     struct PropertyWithLoan {
@@ -23,15 +22,6 @@ contract Bank is AccessControl {
 
     constructor() {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        s_factoryContract = FactoryProperty(msg.sender);
-    }
-
-    /**
-     * Only collections created by the factory contract
-     */
-    modifier onlyTrustedCollections(){
-        require(s_factoryContract.collectionCreated(msg.sender), "Property was not created by factory");
-        _;
     }
 
     function createNewPropertyLoan(
@@ -71,7 +61,7 @@ contract Bank is AccessControl {
      * @dev This function will be called ONLY by the collections created by the factory contract
      * and it will register them in the bank after they have been sold out.
      */
-    function registerProperty() external onlyTrustedCollections() { 
+    function registerProperty() external { 
         //lets follow the example with the comments
         address ADDRESS_OF_THE_COLLECTION = 0x55d398326f99059fF775485246999027B3197955;
         PropertyLoan _property = PropertyLoan(msg.sender);
@@ -104,10 +94,4 @@ contract Bank is AccessControl {
 
         require(USDT.transfer(_user, _amountToPayUser),"The bank doesn't have funds");
     }
-
-    //~~~~ VIEW FUNCTIONS ~~~~
-    function factoryContract() public view returns(FactoryProperty){
-        return s_factoryContract;
-    }
-
 }

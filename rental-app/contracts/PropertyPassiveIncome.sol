@@ -7,8 +7,5 @@ import "./FactoryProperty.sol";
 import "./Bank.sol";
 
 contract PropertyPassiveIncome is ERC20 {
-
-    constructor() ERC20("",""){
-
-    }
+    constructor() ERC20("", "") {}
 }

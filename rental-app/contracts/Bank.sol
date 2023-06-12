@@ -96,4 +96,9 @@ contract Bank is AccessControl {
             "The bank doesn't have sufficient funds"
         );
     }
+
+    function registeredPropertyAddresses(uint256 _id) external returns(address) {
+        return s_propertyAddresses[_id];
+    }
+
 }

@@ -16,7 +16,7 @@ contract Bank {
     struct PropertyWithLoan {
         string name;
         uint256 installmentPerPiece;
-        uint256 startingTime;
+        bool isActive;
         mapping(address => uint256) timeUserHasClaimed;
     }
 
@@ -61,7 +61,7 @@ contract Bank {
         PropertyWithLoan storage property = s_properties[_collectionAddress];
         property.name = _name;
         property.installmentPerPiece = _monthlyInstallmentsPerPiece;
-        property.startingTime = block.timestamp;       
+        property.isActive = true;
     }
 
     function claimReturns(address _collection) external onlyWallets(){

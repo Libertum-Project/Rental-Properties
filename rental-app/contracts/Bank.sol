@@ -61,32 +61,6 @@ contract Bank is AccessControl {
         s_propertyAddresses.push(address(property));
     }
 
-    /**
-     * @dev This function will be called ONLY by the collections created by the factory contract
-     * and it will register them in the bank after they have been sold out.
-     */
-    function registerProperty() external { 
-        //lets follow the example with the comments
-        address ADDRESS_OF_THE_COLLECTION = 0x55d398326f99059fF775485246999027B3197955;
-        PropertyLoan _property = PropertyLoan(msg.sender);
-        uint256 _durationInMonths = _property.durationInMonths(); //5 months
-        uint256 _totalPiecesSold = _property.totalPiecesSold(); //100
-        uint256 _totalRate = _property.totalRate(); //10
-        uint256 _amountBorrowed = USDT.balanceOf(address(_property)); //10.000usdt
-        uint256 _totalAmountToPay = _amountBorrowed +((_amountBorrowed * _totalRate)/100); //10.000usdt + (10.000*10/100) = 11.000usdt
-        uint256 _monthlyInstallmentsInTotal = _totalAmountToPay / _durationInMonths; //11.000usdt / 5 months = 2.200usdt
-        uint256 _monthlyInstallmentsPerPiece = _monthlyInstallmentsInTotal / _totalPiecesSold; //2.200 / 100 = 22usdt (each user can claim 22usdt per NFT)
-        string memory _name = _property.name();
-        _createAndRegisterNewProperty(_name, _monthlyInstallmentsPerPiece,ADDRESS_OF_THE_COLLECTION);
-    }
-
-    function _createAndRegisterNewProperty(string memory _name, uint256 _monthlyInstallmentsPerPiece, address _collectionAddress) internal{
-        PropertyWithLoan storage property = s_properties[_collectionAddress];
-        property.name = _name;
-        property.installmentPerPiece = _monthlyInstallmentsPerPiece;
-        property.isActive = true;
-    }
-
     function claimReturns(address _collection) external {
         require(s_properties[_collection].isActive, "Property payouts are not active");
 

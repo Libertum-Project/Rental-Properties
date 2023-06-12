@@ -28,7 +28,7 @@ contract PropertyLoan is ERC20 {
     */
 
     //~~~ CONSTANT VARIABLES ~~~
-    IERC20 constant USDT = IERC20(0x55d398326f99059fF775485246999027B3197955); //*TO EDIT* USDT in BCS network
+    IERC20 constant USDT = IERC20(0x55d398326f99059fF775485246999027B3197955); //*TO EDIT* USDT in BSC network
 
     //~~~ STATE VARIABLES ~~~
     FactoryProperty private s_factoryContract; //factoryProperty contract
@@ -44,14 +44,12 @@ contract PropertyLoan is ERC20 {
 
     uint256 s_piecesSold; //to track the # of pieces that has been sold
     uint256 s_totalAmountBorrowed; //track how much was borrowed and reduce this every month
-    string s_name; //to do - OPTIONAL for easier track for Libertum&Envwise team
    
     constructor(string memory _name, string memory _symbol, uint256 _totalSupply, uint256 _initialPricePerPiece, uint256 _valueBackup, uint256 _duration, uint256 _totalRate,  address _receiver, address _bankAddress)ERC20(_name, _symbol){
         require((_totalSupply * _initialPricePerPiece) < _valueBackup, "Property: Exceeds value that is backed up");
         //set factory & bank addresses
         s_factoryContract = FactoryProperty(msg.sender);
         s_bank = Bank(_bankAddress);
-        s_name = _name;
 
         //set characteristics of property
         s_totalSupply = _totalSupply;
@@ -112,7 +110,4 @@ contract PropertyLoan is ERC20 {
         return s_totalRate;
     }
 
-    function nameOfTheProperty() public view returns(string memory){
-        return s_name;
-    }
 }

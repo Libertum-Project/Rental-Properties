@@ -11,7 +11,10 @@ contract Bank is AccessControl {
     // Edit this address when deploying on other networks with a different USDT address
     address private constant USDT_ADDRESS = 0x55d398326f99059fF775485246999027B3197955; // USDT(BSC)
     IERC20 constant USDT = IERC20(USDT_ADDRESS);
-    mapping (address => PropertyWithLoan) private s_properties;
+
+    // Mapping of all the properties and an iterable array for finding all the properties
+    mapping(address => PropertyWithLoan) private s_properties;
+    address[] private s_propertyAddresses;
 
     struct PropertyWithLoan {
         string name;
@@ -55,6 +58,7 @@ contract Bank is AccessControl {
         s_properties[address(property)].name = _name;
         s_properties[address(property)].installmentPerPiece = monthlyInstallments;
         s_properties[address(property)].isActive = true;
+        s_propertyAddresses.push(address(property));
     }
 
     /**

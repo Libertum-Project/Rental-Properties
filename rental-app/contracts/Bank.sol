@@ -65,11 +65,14 @@ contract Bank {
     }
 
     function claimReturns(address _collection) external onlyWallets(){
+        require(s_properties[_collection].isActive, "Property payouts are not active");
+
         address _user = msg.sender;
         uint256 _installment = s_properties[_collection].installmentPerPiece;
         uint256 _piecesOfUser = IERC20(_collection).balanceOf(_user);
         uint256 _amountToPayUser = _piecesOfUser * _installment;
         //TO DO - logic for the time (to claim once a month)
+
         require(USDT.transfer(_user, _amountToPayUser),"The bank doesn't have funds");
     }
 

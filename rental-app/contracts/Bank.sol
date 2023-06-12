@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract Bank {
 
-    IERC20 constant USDT = IERC20(0x55d398326f99059fF775485246999027B3197955); //*TO EDIT* USDT in BCS network
+    IERC20 constant USDT = IERC20(0x55d398326f99059fF775485246999027B3197955); //*TO EDIT* USDT in BSC network
     FactoryProperty private s_factoryContract; //only this contract will be able to register properties
     mapping (address => PropertyWithLoan) private s_properties;
 
@@ -43,6 +43,7 @@ contract Bank {
      */
     function registerProperty() external onlyTrustedCollections() { 
         //lets follow the example with the comments
+        address ADDRESS_OF_THE_COLLECTION = 0x55d398326f99059fF775485246999027B3197955;
         PropertyLoan _property = PropertyLoan(msg.sender);
         uint256 _durationInMonths = _property.durationInMonths(); //5 months
         uint256 _totalPiecesSold = _property.totalPiecesSold(); //100
@@ -51,15 +52,15 @@ contract Bank {
         uint256 _totalAmountToPay = _amountBorrowed +((_amountBorrowed * _totalRate)/100); //10.000usdt + (10.000*10/100) = 11.000usdt
         uint256 _monthlyInstallmentsInTotal = _totalAmountToPay / _durationInMonths; //11.000usdt / 5 months = 2.200usdt
         uint256 _monthlyInstallmentsPerPiece = _monthlyInstallmentsInTotal / _totalPiecesSold; //2.200 / 100 = 22usdt (each user can claim 22usdt per NFT)
-        string memory _name = _property.nameOfTheProperty();
-        _createAndRegisterNewProperty(_name, _monthlyInstallmentsPerPiece);
+        string memory _name = _property.name();
+        _createAndRegisterNewProperty(_name, _monthlyInstallmentsPerPiece,ADDRESS_OF_THE_COLLECTION);
     }
 
-    function _createAndRegisterNewProperty(string memory _name, uint256 _monthlyInstallmentsPerPiece) internal{
-        PropertyWithLoan storage newProperty;
-        newProperty.name = _name;
-        newProperty.installmentPerPiece = _monthlyInstallmentsPerPiece;
-        newProperty.startingTime = block.timestamp;
+    function _createAndRegisterNewProperty(string memory _name, uint256 _monthlyInstallmentsPerPiece, address _collectionAddress) internal{
+        PropertyWithLoan storage property = s_properties[_collectionAddress];
+        property.name = _name;
+        property.installmentPerPiece = _monthlyInstallmentsPerPiece;
+        property.startingTime = block.timestamp;       
     }
 
     function claimReturns(address _collection) external onlyWallets(){

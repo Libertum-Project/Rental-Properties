@@ -68,8 +68,22 @@ contract Bank is AccessControl {
         uint256 _installment = s_properties[_collection].installmentPerPiece;
         uint256 _piecesOfUser = IERC20(_collection).balanceOf(_user);
         uint256 _amountToPayUser = _piecesOfUser * _installment;
-        //TO DO - logic for the time (to claim once a month)
 
-        require(USDT.transfer(_user, _amountToPayUser),"The bank doesn't have funds");
+        // Check that user has not claimed this month
+        require(
+            s_properties[_collection].timeUserHasClaimed[_user] < block.timestamp - 30 days,
+            "User has already claimed this month"
+        );
+
+        // If user has not claimed before, update claim time to current time
+        if (s_properties[_collection].timeUserHasClaimed[_user] == 0) {
+            s_properties[_collection].timeUserHasClaimed[_user] = block.timestamp;
+        } else {
+            // Add 30 days from the user's last claim (so that timely claims are not required)
+            s_properties[_collection].timeUserHasClaimed[_user] += 30 days;
+        }
+
+        // Transfer funds (if available) to the user
+        require(USDT.transfer(_user, _amountToPayUser), "The bank doesn't have sufficient funds");
     }
 }

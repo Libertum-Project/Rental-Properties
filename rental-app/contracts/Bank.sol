@@ -7,8 +7,9 @@ import "./FactoryProperty.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract Bank {
-
-    IERC20 constant USDT = IERC20(0x55d398326f99059fF775485246999027B3197955); //*TO EDIT* USDT in BSC network
+    // Edit this address when deploying on other networks with a different USDT address
+    address private constant USDT_ADDRESS = 0x55d398326f99059fF775485246999027B3197955; // USDT(BSC)
+    IERC20 constant USDT = IERC20(USDT_ADDRESS);
     FactoryProperty private s_factoryContract; //only this contract will be able to register properties
     mapping (address => PropertyWithLoan) private s_properties;
 

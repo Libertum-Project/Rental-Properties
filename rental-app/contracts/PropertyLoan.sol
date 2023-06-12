@@ -7,7 +7,6 @@ import "./FactoryProperty.sol";
 import "./Bank.sol";
 
 contract PropertyLoan is ERC20 {
-
     /*
     SUMMARY OF THIS CONTRACT:
         -factoryContract is the one that deploys this(Property) contract
@@ -39,14 +38,27 @@ contract PropertyLoan is ERC20 {
     uint256 s_initialPricePerPiece; //price per piece in USDT
     uint256 s_valueBackup; //max value that can be sold (backup by envwise/libertum)
     uint256 s_duration; //duration of the loan in months(will be paid monthly)
-    uint256 s_totalRate; //percentage returns offered by this property per month 
+    uint256 s_totalRate; //percentage returns offered by this property per month
     address s_receiver; //address that will receive the funds (it can be either Envwise, Libertum or the property owner)
 
     uint256 s_piecesSold; //to track the # of pieces that has been sold
     uint256 s_totalAmountBorrowed; //track how much was borrowed and reduce this every month
-   
-    constructor(string memory _name, string memory _symbol, uint256 _totalSupply, uint256 _initialPricePerPiece, uint256 _valueBackup, uint256 _duration, uint256 _totalRate,  address _receiver, address _bankAddress)ERC20(_name, _symbol){
-        require((_totalSupply * _initialPricePerPiece) < _valueBackup, "Property: Exceeds value that is backed up");
+
+    constructor(
+        string memory _name,
+        string memory _symbol,
+        uint256 _totalSupply,
+        uint256 _initialPricePerPiece,
+        uint256 _valueBackup,
+        uint256 _duration,
+        uint256 _totalRate,
+        address _receiver,
+        address _bankAddress
+    ) ERC20(_name, _symbol) {
+        require(
+            (_totalSupply * _initialPricePerPiece) < _valueBackup,
+            "Property: Exceeds value that is backed up"
+        );
         //set factory & bank addresses
         s_factoryContract = FactoryProperty(msg.sender);
         s_bank = Bank(_bankAddress);
@@ -60,17 +72,17 @@ contract PropertyLoan is ERC20 {
     }
 
     function buyPiece(uint256 _pieces) public {
-        require(_pieces> 0 && _pieces < piecesAvailable());
+        require(_pieces > 0 && _pieces < piecesAvailable());
         //transfer the token to the user and disable the transfer function
         //transfer usdt from user to this contract, ONLY after all pcs are sold, transfer funds to s_receiver
         //s_piecesSold ++;
-        _soldOut(); 
+        _soldOut();
     }
 
-    function _soldOut() internal{
-        //only when all pieces has been sold this function will be trigger 
+    function _soldOut() internal {
+        //only when all pieces has been sold this function will be trigger
         //and it'll register this property in the bank
-        if(piecesAvailable() == 0){
+        if (piecesAvailable() == 0) {
             s_bank.registerProperty();
             uint256 balanceUSDT = USDT.balanceOf(address(this));
             USDT.transfer(receiverOfTheFunds(), balanceUSDT);
@@ -78,36 +90,35 @@ contract PropertyLoan is ERC20 {
     }
 
     //~~~~ VIEW FUNCTIONS ~~~~
-    function piecesAvailable() public view returns(uint256){
+    function piecesAvailable() public view returns (uint256) {
         return s_totalSupply - s_piecesSold;
     }
 
-    function totalPieces() public view returns(uint256){
+    function totalPieces() public view returns (uint256) {
         return s_totalSupply;
     }
 
-    function totalPiecesSold() public view returns(uint256){
+    function totalPiecesSold() public view returns (uint256) {
         return s_piecesSold;
     }
 
-    function bankContract() external view returns(Bank){
+    function bankContract() external view returns (Bank) {
         return s_bank;
     }
 
-    function factoryContract() external view returns(FactoryProperty){
+    function factoryContract() external view returns (FactoryProperty) {
         return s_factoryContract;
     }
 
-    function receiverOfTheFunds() public view returns(address){
+    function receiverOfTheFunds() public view returns (address) {
         return s_receiver;
     }
 
-    function durationInMonths() public view returns(uint256){
+    function durationInMonths() public view returns (uint256) {
         return s_duration;
     }
-    
-    function totalRate() public view returns(uint256){
+
+    function totalRate() public view returns (uint256) {
         return s_totalRate;
     }
-
 }

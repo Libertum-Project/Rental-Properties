@@ -9,7 +9,8 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 
 contract Bank is AccessControl {
     // Edit this address when deploying on other networks with a different USDT address
-    address private constant USDT_ADDRESS = 0x55d398326f99059fF775485246999027B3197955; // USDT(BSC)
+    address private constant USDT_ADDRESS =
+        0x55d398326f99059fF775485246999027B3197955; // USDT(BSC)
     IERC20 constant USDT = IERC20(USDT_ADDRESS);
 
     // Mapping of all the properties and an iterable array for finding all the properties
@@ -47,22 +48,26 @@ contract Bank is AccessControl {
             _duration,
             _totalRate,
             _receiver,
-            address(this) 
+            address(this)
         );
 
         // Calculate the monthly installment per piece
-        uint256 totalAmount = _valueBackup + _valueBackup * _totalRate / 100;
+        uint256 totalAmount = _valueBackup + (_valueBackup * _totalRate) / 100;
         uint256 monthlyInstallments = totalAmount / _duration / _totalSupply;
 
         // Register the property's properties
         s_properties[address(property)].name = _name;
-        s_properties[address(property)].installmentPerPiece = monthlyInstallments;
+        s_properties[address(property)]
+            .installmentPerPiece = monthlyInstallments;
         s_properties[address(property)].isActive = true;
         s_propertyAddresses.push(address(property));
     }
 
     function claimReturns(address _collection) external {
-        require(s_properties[_collection].isActive, "Property payouts are not active");
+        require(
+            s_properties[_collection].isActive,
+            "Property payouts are not active"
+        );
 
         address _user = msg.sender;
         uint256 _installment = s_properties[_collection].installmentPerPiece;
@@ -71,19 +76,24 @@ contract Bank is AccessControl {
 
         // Check that user has not claimed this month
         require(
-            s_properties[_collection].timeUserHasClaimed[_user] < block.timestamp - 30 days,
+            s_properties[_collection].timeUserHasClaimed[_user] <
+                block.timestamp - 30 days,
             "User has already claimed this month"
         );
 
         // If user has not claimed before, update claim time to current time
         if (s_properties[_collection].timeUserHasClaimed[_user] == 0) {
-            s_properties[_collection].timeUserHasClaimed[_user] = block.timestamp;
+            s_properties[_collection].timeUserHasClaimed[_user] = block
+                .timestamp;
         } else {
             // Add 30 days from the user's last claim (so that timely claims are not required)
             s_properties[_collection].timeUserHasClaimed[_user] += 30 days;
         }
 
         // Transfer funds (if available) to the user
-        require(USDT.transfer(_user, _amountToPayUser), "The bank doesn't have sufficient funds");
+        require(
+            USDT.transfer(_user, _amountToPayUser),
+            "The bank doesn't have sufficient funds"
+        );
     }
 }

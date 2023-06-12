@@ -5,6 +5,7 @@ import "./PropertyLoan.sol"; //*TO EDIT* we can change this later for an interfa
 import "./PropertyPassiveIncome.sol"; //*TO EDIT* we can change this later for an interface IProperty
 import "./FactoryProperty.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
 
 contract Bank {
     // Edit this address when deploying on other networks with a different USDT address

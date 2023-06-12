@@ -21,15 +21,9 @@ contract Bank is AccessControl {
         mapping(address => uint256) timeUserHasClaimed;
     }
 
-
     constructor() {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         s_factoryContract = FactoryProperty(msg.sender);
-    }
-
-    modifier onlyWallets(){
-        require(msg.sender == tx.origin, "Only EOAs allowed"); //avoid to be called by smart contracts
-        _;
     }
 
     /**
@@ -66,7 +60,7 @@ contract Bank is AccessControl {
         property.isActive = true;
     }
 
-    function claimReturns(address _collection) external onlyWallets(){
+    function claimReturns(address _collection) external {
         require(s_properties[_collection].isActive, "Property payouts are not active");
 
         address _user = msg.sender;

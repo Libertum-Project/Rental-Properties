@@ -64,5 +64,24 @@ describe("CapitalRepaymentProperty", function () {
         1
       );
     });
+
+    it("Should allow users to mint multiple tokens at once", async function () {
+      const { owner, capitalRepaymentProperty, mockUSDT } =
+        await deployCapitalRepaymentFixture();
+
+      // Approve USDT for the contract
+      await mockUSDT
+        .connect(owner)
+        .approve(
+          capitalRepaymentProperty.address,
+          ethers.utils.parseUnits("500", 6)
+        );
+
+      // Mint 5 NFTs for 500 USDT
+      await capitalRepaymentProperty.mint(5);
+      expect(await capitalRepaymentProperty.balanceOf(owner.address)).to.equal(
+        5
+      );
+    });
   });
 });

@@ -8,4 +8,8 @@ contract MockUSDT is ERC20 {
         // Mint 1,000 USDT to the deployer of the contract
         _mint(msg.sender, 1000 * 10 ** 6);
     }
+
+    function faucet(uint256 quantity) external {
+        _mint(msg.sender, quantity * 10**6);
+    }
 }

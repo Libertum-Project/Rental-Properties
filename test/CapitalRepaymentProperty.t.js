@@ -104,18 +104,20 @@ describe("CapitalRepaymentProperty", function () {
     });
 
     it("Should revert if the supply has been sold out", async function () {
-      const { owner, mockUSDT, capitalRepaymentProperty } = await loadFixture(deployCapitalRepaymentFixture);
+      const { owner, mockUSDT, capitalRepaymentProperty } = await loadFixture(
+        deployCapitalRepaymentFixture
+      );
 
       // Mint 1M USDT for the owner
       mockUSDT.connect(owner).faucet(1_000_000);
 
       // Approve USDT for the contract
       await mockUSDT
-      .connect(owner)
-      .approve(
-        capitalRepaymentProperty.address,
-        ethers.utils.parseUnits("1001000", 6)
-      );
+        .connect(owner)
+        .approve(
+          capitalRepaymentProperty.address,
+          ethers.utils.parseUnits("1001000", 6)
+        );
 
       // Mint 101 NFTs (1 over total supply)
       await expect(capitalRepaymentProperty.mint(101)).to.be.revertedWith(
@@ -168,16 +170,17 @@ describe("CapitalRepaymentProperty", function () {
       await capitalRepaymentProperty.connect(user).mint(1);
 
       // Verify that contract has 1000 USDT
-      expect(await mockUSDT.balanceOf(capitalRepaymentProperty.address)).to.equal(
-        ethers.utils.parseUnits("1000", 6)
-      );
+      expect(
+        await mockUSDT.balanceOf(capitalRepaymentProperty.address)
+      ).to.equal(ethers.utils.parseUnits("1000", 6));
 
       // Attempt to withdraw USDT and verify contract's USDT balance
-      await expect(capitalRepaymentProperty.connect(user).withdraw()).to.be
-        .revertedWith("Ownable: caller is not the owner");
-      expect(await mockUSDT.balanceOf(capitalRepaymentProperty.address)).to.equal(
-        ethers.utils.parseUnits("1000", 6)
-      );
+      await expect(
+        capitalRepaymentProperty.connect(user).withdraw()
+      ).to.be.revertedWith("Ownable: caller is not the owner");
+      expect(
+        await mockUSDT.balanceOf(capitalRepaymentProperty.address)
+      ).to.equal(ethers.utils.parseUnits("1000", 6));
     });
 
     it("Should not allow withdrawals if the contract holds no balance", async function () {

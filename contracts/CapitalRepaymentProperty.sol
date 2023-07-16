@@ -3,8 +3,9 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract CapitalRepaymentProperty is ERC721 {
+contract CapitalRepaymentProperty is ERC721, Ownable {
     uint256 currentToken;
     uint256 totalSupply;
     uint256 pricePerToken;

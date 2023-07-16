@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 contract CapitalRepaymentProperty is ERC721 {
     uint256 currentToken;
     uint256 totalSupply;
-    uint256 initialPrice;
+    uint256 pricePerToken;
     uint256 collateralizedValue;
     uint256 durationInMonths;
     uint256 interestRate;
@@ -15,13 +15,13 @@ contract CapitalRepaymentProperty is ERC721 {
         string memory name,
         string memory symbol,
         uint256 _totalSupply,
-        uint256 _initialPrice,
+        uint256 _pricePerToken,
         uint256 _collateralizedValue,
         uint256 _durationInMonths,
         uint256 _interestRate
     ) ERC721(name, symbol) {
         totalSupply = _totalSupply;
-        initialPrice = _initialPrice;
+        pricePerToken = _pricePerToken;
         collateralizedValue = _collateralizedValue;
         durationInMonths = _durationInMonths;
         interestRate = _interestRate;

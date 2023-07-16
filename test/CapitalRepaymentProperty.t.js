@@ -83,5 +83,15 @@ describe("CapitalRepaymentProperty", function () {
         5
       );
     });
+
+    it("Should revert if the user has not approved the contract to spend the required amount", async function () {
+      const { owner, capitalRepaymentProperty } =
+        await deployCapitalRepaymentFixture();
+
+      // Mint 1 NFT for 100 USDT
+      await expect(capitalRepaymentProperty.mint(1)).to.be.revertedWith(
+        "ERC20: insufficient allowance"
+      );
+    });
   });
 });

@@ -58,4 +58,11 @@ contract PassiveIncomeProperty is ERC721, Ownable {
             currentToken++;
         }
     }
+
+    function withdraw() external onlyOwner {
+        // Allow the owner (factory) to withdraw all funds from the contract
+        uint256 balance = paymentToken.balanceOf(address(this));
+        require(balance > 0, "PassiveIncomeProperty: no funds to withdraw");
+        paymentToken.transfer(owner(), balance);
+    }
 }

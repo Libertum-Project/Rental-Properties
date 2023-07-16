@@ -34,7 +34,7 @@ contract CapitalRepaymentProperty is ERC721, Ownable {
     }
 
     function mint(uint256 quantity) external {
-        // Check that current token is less than total supply and the correct USDT amount
+        // Check that current token is less than total supply and the correct USD amount
         // has been transferred by the user, we are checking outside of the minting loop
         // as a fail-fast mechanism.
         require(currentToken < totalSupply, "CapitalRepaymentProperty: tokens sold out");
@@ -54,5 +54,12 @@ contract CapitalRepaymentProperty is ERC721, Ownable {
             _safeMint(msg.sender, currentToken);
             currentToken++;
         }
+    }
+
+    function withdraw() external onlyOwner {
+        // Allow the owner (factory) to withdraw all funds from the contract
+        uint256 balance = paymentToken.balanceOf(address(this));
+        require(balance > 0, "CapitalRepaymentProperty: no funds to withdraw");
+        paymentToken.transfer(owner(), balance);
     }
 }

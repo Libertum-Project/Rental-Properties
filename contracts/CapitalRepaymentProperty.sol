@@ -32,7 +32,7 @@ contract CapitalRepaymentProperty is ERC721 {
         paymentToken = IERC20(tokenAddress);
     }
 
-    function mint() external {
+    function mint(uint256 quantity) external {
         // Check that current token is less than total supply and the correct USDT amount
         // has been transferred by the user.
         require(currentToken < totalSupply, "All NFTs have been minted");
@@ -41,12 +41,15 @@ contract CapitalRepaymentProperty is ERC721 {
             paymentToken.transferFrom(
                 msg.sender,
                 address(this),
-                pricePerToken * 10 ** 6
+                pricePerToken * quantity * 10 ** 6
             ),
             "Failed to transfer correct amount for minting"
         );
 
-        _safeMint(msg.sender, currentToken);
-        currentToken++;
+        // Mint the correct quantity of tokens to the user and increment token counter
+        for (uint256 i = 0; i < quantity; i++) {
+            _safeMint(msg.sender, currentToken);
+            currentToken++;
+        }
     }
 }

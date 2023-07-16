@@ -22,20 +22,20 @@ contract CapitalRepaymentProperty is ERC721 {
         uint256 _collateralizedValue,
         uint256 _durationInMonths,
         uint256 _interestRate,
-        address tokenAddress
+        address paymentTokenAddress
     ) ERC721(name, symbol) {
         totalSupply = _totalSupply;
         pricePerToken = _pricePerToken;
         collateralizedValue = _collateralizedValue;
         durationInMonths = _durationInMonths;
         interestRate = _interestRate;
-        paymentToken = IERC20(tokenAddress);
+        paymentToken = IERC20(paymentTokenAddress);
     }
 
     function mint(uint256 quantity) external {
         // Check that current token is less than total supply and the correct USDT amount
         // has been transferred by the user.
-        require(currentToken < totalSupply, "All NFTs have been minted");
+        require(currentToken < totalSupply, "CapitalRepaymentProperty: tokens sold out");
         require(
             // NOTE: 10**6 is the number of decimals for USDT (and most other stablecoins)
             paymentToken.transferFrom(
@@ -43,7 +43,7 @@ contract CapitalRepaymentProperty is ERC721 {
                 address(this),
                 pricePerToken * quantity * 10 ** 6
             ),
-            "Failed to transfer correct amount for minting"
+            "CapitalRepaymentProperty: purchase failed"
         );
 
         // Mint the correct quantity of tokens to the user and increment token counter

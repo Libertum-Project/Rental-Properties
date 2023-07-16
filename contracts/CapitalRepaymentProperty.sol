@@ -4,6 +4,7 @@ pragma solidity 0.8.17;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 contract CapitalRepaymentProperty is ERC721 {
+    uint256 currentToken;
     uint256 totalSupply;
     uint256 initialPrice;
     uint256 collateralizedValue;
@@ -24,5 +25,11 @@ contract CapitalRepaymentProperty is ERC721 {
         collateralizedValue = _collateralizedValue;
         durationInMonths = _durationInMonths;
         interestRate = _interestRate;
+    }
+
+    function mint() external {
+        require(currentToken < totalSupply, "All NFTs have been minted");
+        _safeMint(msg.sender, currentToken);
+        currentToken++;
     }
 }

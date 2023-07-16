@@ -3,7 +3,7 @@ const { loadFixture } = require("@nomicfoundation/hardhat-network-helpers");
 
 describe("CapitalRepaymentProperty", function () {
   async function deployCapitalRepaymentFixture() {
-    const [owner] = await ethers.getSigners();
+    const [owner, user] = await ethers.getSigners();
 
     const MockUSDT = await ethers.getContractFactory("MockUSDT");
     const mockUSDT = await MockUSDT.deploy();
@@ -22,7 +22,7 @@ describe("CapitalRepaymentProperty", function () {
       mockUSDT.address
     );
 
-    return { owner, capitalRepaymentProperty, mockUSDT };
+    return { owner, user, capitalRepaymentProperty, mockUSDT };
   }
 
   describe("Deployment", function () {
@@ -147,6 +147,35 @@ describe("CapitalRepaymentProperty", function () {
       // Withdraw USDT and verify owner's new USDT balance
       await capitalRepaymentProperty.withdraw();
       expect(await mockUSDT.balanceOf(owner.address)).to.equal(
+        ethers.utils.parseUnits("1000", 6)
+      );
+    });
+
+    it("Should not allow non-owners to withdraw USDT held on the contract", async function () {
+      const { user, mockUSDT, capitalRepaymentProperty } =
+        await deployCapitalRepaymentFixture();
+
+      // Mint 1k USDT for the user
+      mockUSDT.connect(user).faucet(1_000);
+
+      // Mint 1 NFT for 1000 USDT
+      await mockUSDT
+        .connect(user)
+        .approve(
+          capitalRepaymentProperty.address,
+          ethers.utils.parseUnits("1000", 6)
+        );
+      await capitalRepaymentProperty.connect(user).mint(1);
+
+      // Verify that contract has 1000 USDT
+      expect(await mockUSDT.balanceOf(capitalRepaymentProperty.address)).to.equal(
+        ethers.utils.parseUnits("1000", 6)
+      );
+
+      // Attempt to withdraw USDT and verify contract's USDT balance
+      await expect(capitalRepaymentProperty.connect(user).withdraw()).to.be
+        .revertedWith("Ownable: caller is not the owner");
+      expect(await mockUSDT.balanceOf(capitalRepaymentProperty.address)).to.equal(
         ethers.utils.parseUnits("1000", 6)
       );
     });

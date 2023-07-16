@@ -179,5 +179,15 @@ describe("CapitalRepaymentProperty", function () {
         ethers.utils.parseUnits("1000", 6)
       );
     });
+
+    it("Should not allow withdrawals if the contract holds no balance", async function () {
+      const { owner, capitalRepaymentProperty } =
+        await deployCapitalRepaymentFixture();
+
+      // Attempt to withdraw USDT and verify contract's USDT balance
+      await expect(capitalRepaymentProperty.withdraw()).to.be.revertedWith(
+        "CapitalRepaymentProperty: no funds to withdraw"
+      );
+    });
   });
 });

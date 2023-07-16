@@ -34,7 +34,8 @@ contract CapitalRepaymentProperty is ERC721 {
 
     function mint(uint256 quantity) external {
         // Check that current token is less than total supply and the correct USDT amount
-        // has been transferred by the user.
+        // has been transferred by the user, we are checking outside of the minting loop
+        // as a fail-fast mechanism.
         require(currentToken < totalSupply, "CapitalRepaymentProperty: tokens sold out");
         require(
             // NOTE: 10**6 is the number of decimals for USDT (and most other stablecoins)
@@ -48,6 +49,7 @@ contract CapitalRepaymentProperty is ERC721 {
 
         // Mint the correct quantity of tokens to the user and increment token counter
         for (uint256 i = 0; i < quantity; i++) {
+            require(currentToken < totalSupply, "CapitalRepaymentProperty: tokens sold out");
             _safeMint(msg.sender, currentToken);
             currentToken++;
         }

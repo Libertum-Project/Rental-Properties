@@ -120,4 +120,75 @@ describe("PassiveIncomeProperty", function () {
       );
     });
   });
+
+  describe("Withdrawals", function () {
+    it("Should allow the owner to withdraw USDT held on the contract", async function () {
+      const { owner, mockUSDT, passiveIncomeProperty } = await loadFixture(
+        deployPassiveIncome
+      );
+
+      // Mint 1k USDT for the owner
+      mockUSDT.connect(owner).faucet(1_000);
+
+      // Mint 1 NFT for 1000 USDT
+      await mockUSDT
+        .connect(owner)
+        .approve(
+          passiveIncomeProperty.address,
+          ethers.utils.parseUnits("1000", 6)
+        );
+      await passiveIncomeProperty.mint(1);
+
+      // Verify that owner's USDT balance is zero
+      expect(await mockUSDT.balanceOf(owner.address)).to.equal(0);
+
+      // Withdraw USDT and verify owner's new USDT balance
+      await passiveIncomeProperty.withdraw();
+      expect(await mockUSDT.balanceOf(owner.address)).to.equal(
+        ethers.utils.parseUnits("1000", 6)
+      );
+    });
+
+    it("Should not allow non-owners to withdraw USDT held on the contract", async function () {
+      const { user, mockUSDT, passiveIncomeProperty } = await loadFixture(
+        deployPassiveIncome
+      );
+
+      // Mint 1k USDT for the user
+      mockUSDT.connect(user).faucet(1_000);
+
+      // Mint 1 NFT for 1000 USDT
+      await mockUSDT
+        .connect(user)
+        .approve(
+          passiveIncomeProperty.address,
+          ethers.utils.parseUnits("1000", 6)
+        );
+      await passiveIncomeProperty.connect(user).mint(1);
+
+      // Verify that contract has 1000 USDT
+      expect(await mockUSDT.balanceOf(passiveIncomeProperty.address)).to.equal(
+        ethers.utils.parseUnits("1000", 6)
+      );
+
+      // Attempt to withdraw USDT and verify contract's USDT balance
+      await expect(
+        passiveIncomeProperty.connect(user).withdraw()
+      ).to.be.revertedWith("Ownable: caller is not the owner");
+      expect(await mockUSDT.balanceOf(passiveIncomeProperty.address)).to.equal(
+        ethers.utils.parseUnits("1000", 6)
+      );
+    });
+
+    it("Should not allow withdrawals if the contract holds no balance", async function () {
+      const { owner, passiveIncomeProperty } = await loadFixture(
+        deployPassiveIncome
+      );
+
+      // Attempt to withdraw USDT and verify contract's USDT balance
+      await expect(passiveIncomeProperty.withdraw()).to.be.revertedWith(
+        "PassiveIncomeProperty: no funds to withdraw"
+      );
+    });
+  });
 });

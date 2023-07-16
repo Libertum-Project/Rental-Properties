@@ -12,7 +12,7 @@ contract CapitalRepaymentProperty is ERC721 {
     uint256 durationInMonths;
     uint256 interestRate;
 
-    IERC20 public usdtToken;
+    IERC20 public paymentToken;
 
     constructor(
         string memory name,
@@ -21,17 +21,15 @@ contract CapitalRepaymentProperty is ERC721 {
         uint256 _pricePerToken,
         uint256 _collateralizedValue,
         uint256 _durationInMonths,
-        uint256 _interestRate
+        uint256 _interestRate,
+        address tokenAddress
     ) ERC721(name, symbol) {
         totalSupply = _totalSupply;
         pricePerToken = _pricePerToken;
         collateralizedValue = _collateralizedValue;
         durationInMonths = _durationInMonths;
         interestRate = _interestRate;
-
-        // USDT address on Polygon
-        // https://polygonscan.com/token/0xc2132d05d31c914a87c6611c10748aeb04b58e8f
-        usdtToken = IERC20(0xc2132D05D31c914a87C6611C10748AEb04B58e8F);
+        paymentToken = IERC20(tokenAddress);
     }
 
     function mint() external {
@@ -39,8 +37,13 @@ contract CapitalRepaymentProperty is ERC721 {
         // has been transferred by the user.
         require(currentToken < totalSupply, "All NFTs have been minted");
         require(
-            usdtToken.transferFrom(msg.sender, address(this), pricePerToken * 10**6),
-            "Failed to transfer USDT"
+            // NOTE: 10**6 is the number of decimals for USDT (and most other stablecoins)
+            paymentToken.transferFrom(
+                msg.sender,
+                address(this),
+                pricePerToken * 10 ** 6
+            ),
+            "Failed to transfer correct amount for minting"
         );
 
         _safeMint(msg.sender, currentToken);

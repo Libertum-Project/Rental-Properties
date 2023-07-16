@@ -27,28 +27,32 @@ describe("CapitalRepaymentProperty", function () {
 
   describe("Deployment", function () {
     it("Should deploy the contract", async function () {
-      const { capitalRepaymentProperty } =
-        await loadFixture(deployCapitalRepayment);
+      const { capitalRepaymentProperty } = await loadFixture(
+        deployCapitalRepayment
+      );
       expect(capitalRepaymentProperty.address).to.not.equal(0);
     });
 
     it("Should set the correct name", async function () {
-      const { capitalRepaymentProperty } =
-        await loadFixture(deployCapitalRepayment);
+      const { capitalRepaymentProperty } = await loadFixture(
+        deployCapitalRepayment
+      );
       expect(await capitalRepaymentProperty.name()).to.equal("Test Property");
     });
 
     it("Should set the correct symbol", async function () {
-      const { capitalRepaymentProperty } =
-        await loadFixture(deployCapitalRepayment);
+      const { capitalRepaymentProperty } = await loadFixture(
+        deployCapitalRepayment
+      );
       expect(await capitalRepaymentProperty.symbol()).to.equal("TP");
     });
   });
 
   describe("Minting", function () {
     it("Should allow users to mint tokens for 1000 USDT", async function () {
-      const { owner, capitalRepaymentProperty, mockUSDT } =
-        await loadFixture(deployCapitalRepayment);
+      const { owner, capitalRepaymentProperty, mockUSDT } = await loadFixture(
+        deployCapitalRepayment
+      );
 
       // Mint 1k USDT for the owner
       mockUSDT.connect(owner).faucet(1_000);
@@ -69,8 +73,9 @@ describe("CapitalRepaymentProperty", function () {
     });
 
     it("Should allow users to mint multiple tokens at once", async function () {
-      const { owner, capitalRepaymentProperty, mockUSDT } =
-        await loadFixture(deployCapitalRepayment);
+      const { owner, capitalRepaymentProperty, mockUSDT } = await loadFixture(
+        deployCapitalRepayment
+      );
 
       // Mint 5k USDT for the owner
       mockUSDT.connect(owner).faucet(5_000);
@@ -91,8 +96,9 @@ describe("CapitalRepaymentProperty", function () {
     });
 
     it("Should revert if the user has not approved the contract to spend the required amount", async function () {
-      const { owner, mockUSDT, capitalRepaymentProperty } =
-        await loadFixture(deployCapitalRepayment);
+      const { owner, mockUSDT, capitalRepaymentProperty } = await loadFixture(
+        deployCapitalRepayment
+      );
 
       // Mint 1k USDT for the owner
       mockUSDT.connect(owner).faucet(1_000);
@@ -104,7 +110,9 @@ describe("CapitalRepaymentProperty", function () {
     });
 
     it("Should revert if the supply has been sold out", async function () {
-      const { owner, mockUSDT, capitalRepaymentProperty } = await loadFixture(deployCapitalRepayment);
+      const { owner, mockUSDT, capitalRepaymentProperty } = await loadFixture(
+        deployCapitalRepayment
+      );
 
       // Mint 1M USDT for the owner
       mockUSDT.connect(owner).faucet(1_000_000);
@@ -126,8 +134,9 @@ describe("CapitalRepaymentProperty", function () {
 
   describe("Withdrawals", function () {
     it("Should allow the owner to withdraw USDT held on the contract", async function () {
-      const { owner, mockUSDT, capitalRepaymentProperty } =
-        await loadFixture(deployCapitalRepayment);
+      const { owner, mockUSDT, capitalRepaymentProperty } = await loadFixture(
+        deployCapitalRepayment
+      );
 
       // Mint 1k USDT for the owner
       mockUSDT.connect(owner).faucet(1_000);
@@ -152,8 +161,9 @@ describe("CapitalRepaymentProperty", function () {
     });
 
     it("Should not allow non-owners to withdraw USDT held on the contract", async function () {
-      const { user, mockUSDT, capitalRepaymentProperty } =
-        await loadFixture(deployCapitalRepayment);
+      const { user, mockUSDT, capitalRepaymentProperty } = await loadFixture(
+        deployCapitalRepayment
+      );
 
       // Mint 1k USDT for the user
       mockUSDT.connect(user).faucet(1_000);
@@ -182,8 +192,9 @@ describe("CapitalRepaymentProperty", function () {
     });
 
     it("Should not allow withdrawals if the contract holds no balance", async function () {
-      const { owner, capitalRepaymentProperty } =
-        await loadFixture(deployCapitalRepayment);
+      const { owner, capitalRepaymentProperty } = await loadFixture(
+        deployCapitalRepayment
+      );
 
       // Attempt to withdraw USDT and verify contract's USDT balance
       await expect(capitalRepaymentProperty.withdraw()).to.be.revertedWith(

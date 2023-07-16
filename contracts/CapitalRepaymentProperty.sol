@@ -39,7 +39,7 @@ contract CapitalRepaymentProperty is ERC721 {
         // has been transferred by the user.
         require(currentToken < totalSupply, "All NFTs have been minted");
         require(
-            usdtToken.transferFrom(msg.sender, address(this), pricePerToken),
+            usdtToken.transferFrom(msg.sender, address(this), pricePerToken * 10**6),
             "Failed to transfer USDT"
         );
 

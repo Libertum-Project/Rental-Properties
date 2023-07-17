@@ -14,6 +14,11 @@ contract PassiveIncomeProperty is ERC721, Ownable {
 
     IERC20 public paymentToken;
 
+    // Tracks the state of the property (determines if claims are allowed)
+    bool public isActive;
+    uint256 public startTime;
+    uint256 public unpaidAmount;
+
     constructor(
         string memory name,
         string memory symbol,
@@ -28,6 +33,7 @@ contract PassiveIncomeProperty is ERC721, Ownable {
         collateralizedValue = _collateralizedValue;
         interestRate = _interestRate;
         paymentToken = IERC20(paymentTokenAddress);
+        unpaidAmount = _collateralizedValue;
     }
 
     function mint(uint256 quantity) external {

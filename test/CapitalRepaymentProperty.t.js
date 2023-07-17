@@ -161,7 +161,7 @@ describe("CapitalRepaymentProperty", function () {
       expect(await mockUSDT.balanceOf(owner.address)).to.equal(0);
 
       // Withdraw USDT and verify owner's new USDT balance
-      await capitalRepaymentProperty.withdraw();
+      await capitalRepaymentProperty.withdraw(owner.address);
       expect(await mockUSDT.balanceOf(owner.address)).to.equal(
         ethers.utils.parseUnits("1000", 6)
       );
@@ -191,7 +191,7 @@ describe("CapitalRepaymentProperty", function () {
 
       // Attempt to withdraw USDT and verify contract's USDT balance
       await expect(
-        capitalRepaymentProperty.connect(user).withdraw()
+        capitalRepaymentProperty.connect(user).withdraw(user.address)
       ).to.be.revertedWith("Ownable: caller is not the owner");
       expect(
         await mockUSDT.balanceOf(capitalRepaymentProperty.address)
@@ -204,7 +204,7 @@ describe("CapitalRepaymentProperty", function () {
       );
 
       // Attempt to withdraw USDT and verify contract's USDT balance
-      await expect(capitalRepaymentProperty.withdraw()).to.be.revertedWith(
+      await expect(capitalRepaymentProperty.withdraw(owner.address)).to.be.revertedWith(
         "CapitalRepaymentProperty: no funds to withdraw"
       );
     });

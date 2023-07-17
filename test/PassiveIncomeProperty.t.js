@@ -150,7 +150,7 @@ describe("PassiveIncomeProperty", function () {
       expect(await mockUSDT.balanceOf(owner.address)).to.equal(0);
 
       // Withdraw USDT and verify owner's new USDT balance
-      await passiveIncomeProperty.withdraw();
+      await passiveIncomeProperty.withdraw(owner.address);
       expect(await mockUSDT.balanceOf(owner.address)).to.equal(
         ethers.utils.parseUnits("1000", 6)
       );
@@ -180,7 +180,7 @@ describe("PassiveIncomeProperty", function () {
 
       // Attempt to withdraw USDT and verify contract's USDT balance
       await expect(
-        passiveIncomeProperty.connect(user).withdraw()
+        passiveIncomeProperty.connect(user).withdraw(user.address)
       ).to.be.revertedWith("Ownable: caller is not the owner");
       expect(await mockUSDT.balanceOf(passiveIncomeProperty.address)).to.equal(
         ethers.utils.parseUnits("1000", 6)
@@ -193,7 +193,7 @@ describe("PassiveIncomeProperty", function () {
       );
 
       // Attempt to withdraw USDT and verify contract's USDT balance
-      await expect(passiveIncomeProperty.withdraw()).to.be.revertedWith(
+      await expect(passiveIncomeProperty.withdraw(owner.address)).to.be.revertedWith(
         "PassiveIncomeProperty: no funds to withdraw"
       );
     });

@@ -240,6 +240,7 @@ describe("CapitalRepaymentProperty", function () {
         deployCapitalRepayment
       );
 
+      // Get latest block time and compare to the one recently set
       await capitalRepaymentProperty.setActive();
       const currentBlock = await ethers.provider.getBlock("latest");
       expect(await capitalRepaymentProperty.startTime()).to.equal(

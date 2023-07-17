@@ -1,5 +1,8 @@
 const { expect } = require("chai");
-const { loadFixture } = require("@nomicfoundation/hardhat-network-helpers");
+const {
+  loadFixture,
+  time,
+} = require("@nomicfoundation/hardhat-network-helpers");
 
 describe("PropertyFactoryAndBank", function () {
   async function deployPropertyFactoryAndBank() {
@@ -392,6 +395,124 @@ describe("PropertyFactoryAndBank", function () {
           .connect(owner)
           .claimCapitalRepayment(address, [0])
       ).to.be.revertedWith("PropertyFactoryAndBank: property is not active");
+    });
+
+    it("Should not allow a user to claim monthly payouts if contract has insufficient funds", async function () {
+      const { owner, propertyFactoryAndBank, mockUSDT } = await loadFixture(
+        deployPropertyFactoryAndBank
+      );
+
+      // Create a new capital repayment property
+      await propertyFactoryAndBank
+        .connect(owner)
+        .newCapitalRepaymentProperty(
+          "Test Property",
+          "TP",
+          100,
+          1000,
+          100000,
+          12,
+          500,
+          mockUSDT.address
+        );
+
+      // Mint 1000 USDT to owner
+      await mockUSDT.connect(owner).faucet(1_000);
+
+      // Create contract instance from stored address
+      const address = await propertyFactoryAndBank.capitalRepaymentProperties(
+        0
+      );
+      const CapitalRepaymentProperty = await ethers.getContractFactory(
+        "CapitalRepaymentProperty"
+      );
+      const capitalRepaymentProperty = await CapitalRepaymentProperty.attach(
+        address
+      );
+
+      // Buy a token
+      await mockUSDT
+        .connect(owner)
+        .approve(
+          capitalRepaymentProperty.address,
+          ethers.utils.parseUnits("1000", 6)
+        );
+      await capitalRepaymentProperty.connect(owner).mint(1);
+
+      // Activate the property
+      await propertyFactoryAndBank
+        .connect(owner)
+        .setActiveCapitalRepayment(address);
+
+      // Increase time by 30 days
+      await time.increase(30 * 24 * 60 * 60);
+
+      // Attempt to claim
+      await expect(
+        propertyFactoryAndBank
+          .connect(owner)
+          .claimCapitalRepayment(address, [0])
+      ).to.be.revertedWith("PropertyFactoryAndBank: insufficient funds");
+    });
+
+    it("Should not allow a user to claim monthly payouts if insufficient time has elapsed", async function () {
+      const { owner, propertyFactoryAndBank, mockUSDT } = await loadFixture(
+        deployPropertyFactoryAndBank
+      );
+
+      // Create a new capital repayment property
+      await propertyFactoryAndBank
+        .connect(owner)
+        .newCapitalRepaymentProperty(
+          "Test Property",
+          "TP",
+          100,
+          1000,
+          100000,
+          12,
+          500,
+          mockUSDT.address
+        );
+
+      // Mint 2k USDT to owner and transfer 1k to contract
+      await mockUSDT.connect(owner).faucet(2_000);
+      await mockUSDT
+        .connect(owner)
+        .transfer(propertyFactoryAndBank.address, ethers.utils.parseUnits("1000", 6));
+
+      // Create contract instance from stored address
+      const address = await propertyFactoryAndBank.capitalRepaymentProperties(
+        0
+      );
+      const CapitalRepaymentProperty = await ethers.getContractFactory(
+        "CapitalRepaymentProperty"
+      );
+      const capitalRepaymentProperty = await CapitalRepaymentProperty.attach(
+        address
+      );
+
+      // Buy a token
+      await mockUSDT
+        .connect(owner)
+        .approve(
+          capitalRepaymentProperty.address,
+          ethers.utils.parseUnits("1000", 6)
+        );
+      await capitalRepaymentProperty.connect(owner).mint(1);
+
+      // Activate the property
+      await propertyFactoryAndBank
+        .connect(owner)
+        .setActiveCapitalRepayment(address);
+
+      console.log(await mockUSDT.balanceOf(propertyFactoryAndBank.address));
+
+      // Attempt to claim
+      await expect(
+        propertyFactoryAndBank
+          .connect(owner)
+          .claimCapitalRepayment(address, [0])
+      ).to.be.revertedWith("PropertyFactoryAndBank: payout not ready");
     });
   });
 });

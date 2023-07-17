@@ -19,6 +19,7 @@ contract CapitalRepaymentProperty is ERC721, Ownable {
     bool public isActive;
     uint256 public startTime;
     mapping(uint256 => uint256) public lastClaimed;
+    mapping(uint256 => uint256) public numberOfClaims;
 
     constructor(
         string memory name,
@@ -93,5 +94,13 @@ contract CapitalRepaymentProperty is ERC721, Ownable {
     ) external onlyOwner {
         // Allow the owner (factory) to set the last claimed timestamp for a token
         lastClaimed[tokenId] = timestamp;
+    }
+
+    function setNumberOfClaims(
+        uint256 tokenId,
+        uint256 _numberOfClaims
+    ) external onlyOwner {
+        // Allow the owner (factory) to set the number of claims for a token
+        numberOfClaims[tokenId] = _numberOfClaims;
     }
 }

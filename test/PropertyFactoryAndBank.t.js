@@ -31,4 +31,28 @@ describe("PropertyFactoryAndBank", function () {
       expect(await propertyFactoryAndBank.owner()).to.equal(owner.address);
     });
   });
+
+  describe("Creating new capital repayment properties", function () {
+    it("Should allow the owner to create a new capital repayment property", async function () {
+      const { owner, propertyFactoryAndBank, mockUSDT } = await loadFixture(
+        deployPropertyFactoryAndBank
+      );
+
+      // Create a new capital repayment property
+      await propertyFactoryAndBank
+        .connect(owner)
+        .newCapitalRepaymentProperty(
+          "Test Property",
+          "TP",
+          100,
+          1000,
+          100000,
+          12,
+          500,
+          mockUSDT.address
+        );
+
+      expect (await propertyFactoryAndBank.numCapitalRepaymentProperties()).to.equal(1);
+    });
+  });
 });

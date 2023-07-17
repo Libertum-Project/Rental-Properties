@@ -121,3 +121,42 @@ Funds held on specific property contracts (via sale of NFTs) can be withdrawn us
 
     - _address_ `from` - the address of the passive income property contract
     - _address_ `to` - the specified destination of the funds held by the contract
+
+## CapitalRepaymentProperty
+
+### External Contract Functions
+
+This contract contains functions used by the bank contract:
+
+1. `withdraw(address to)`
+2. `setActive()`
+3. `setInactive()`
+4. `setLastClaimed(uint256 tokenId, uint256 timestamp)`
+5. `setNumberOfClaims(uint256 tokenId, uint256 _numberOfClaims)`
+
+These cannot be called by anybody else except the bank contract, which owns the contract it created.f
+
+### User Minting
+
+The user is able to mint NFTs belonging to the collection provided that:
+
+- The tokens are not sold out
+- They have approved the contract for the requisite amount of USDT/USDC needed to purchase NFT(s)
+
+6. **mint** - prior to calling this function on the frontend, be sure to request approval from the user for the contract to spend _x_ stablecoin as defined by the contract, or the transaction will fail because of insufficient allowance. The number _x_ can be computed by `quantity * pricePerToken * 10**6` (note that all stablecoins have 6 decimal places). This function accepts one argument:
+
+   - _uint256_ `quantity` - the number of NFTs the user wishes to purchase
+
+### Getter Functions
+
+The properties of this contract can be accessed using the getter functions provided by Solidity for most variables.
+
+7. **currentToken()** - returns the next token id that will be minted
+8. **totalSupply()** - returns the total of tokens in this collection
+9. **pricePerToken()** - returns the price per token
+10. **collateralizedValue()** - returns the total collateralized value of the property
+11. **durationInMonths()** - returns the total duration of the loan, in months
+12. **interestRate()** - returns the monthly interest rate multiplied by 100
+13. **paymentToken()** - returns the address of the payment token accepted by the contract
+14. **isActive()** - returns a boolean representing whether payouts are active
+15. **startTime()** - returns a uint256 timestamp denoting when payouts started

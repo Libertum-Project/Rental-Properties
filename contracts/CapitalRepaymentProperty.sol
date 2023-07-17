@@ -18,6 +18,7 @@ contract CapitalRepaymentProperty is ERC721, Ownable {
     // Tracks the state of the property (determines if claims are allowed)
     bool public isActive;
     uint256 public startTime;
+    mapping(uint256 => uint256) public lastClaimed;
 
     constructor(
         string memory name,
@@ -84,5 +85,13 @@ contract CapitalRepaymentProperty is ERC721, Ownable {
         // Allow the owner (factory) to deactivate claims
         require(isActive, "CapitalRepaymentProperty: already inactive");
         isActive = false;
+    }
+
+    function setLastClaimed(
+        uint256 tokenId,
+        uint256 timestamp
+    ) external onlyOwner {
+        // Allow the owner (factory) to set the last claimed timestamp for a token
+        lastClaimed[tokenId] = timestamp;
     }
 }

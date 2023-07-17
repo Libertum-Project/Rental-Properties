@@ -5,6 +5,7 @@ import "./CapitalRepaymentProperty.sol";
 import "./PassiveIncomeProperty.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "hardhat/console.sol";
 
 contract PropertyFactoryAndBank is Ownable {
     address[] public capitalRepaymentProperties;
@@ -69,6 +70,26 @@ contract PropertyFactoryAndBank is Ownable {
         return address(property);
     }
 
+    function setActiveCapitalRepayment(
+        address propertyAddress
+    ) external onlyOwner {
+        CapitalRepaymentProperty property = CapitalRepaymentProperty(
+            propertyAddress
+        );
+
+        property.setActive();
+    }
+
+    function setInactiveCapitalRepayment(
+        address propertyAddress
+    ) external onlyOwner {
+        CapitalRepaymentProperty property = CapitalRepaymentProperty(
+            propertyAddress
+        );
+
+        property.setInactive();
+    }
+
     function claimCapitalRepayment(
         address propertyAddress,
         uint256[] memory tokenIds
@@ -111,13 +132,16 @@ contract PropertyFactoryAndBank is Ownable {
             }
         }
 
-        uint256 totalAmount = property.collateralizedValue() *
-            10 ** 6 *
-            (1 + property.interestRate() / 10_000);
+        uint256 totalAmount = (property.collateralizedValue() *
+            (10000 + property.interestRate())) / 10000;
+        console.log(totalAmount, "totalAmount");
         uint256 monthlyPayment = totalAmount /
             property.durationInMonths() /
             property.totalSupply();
-        uint256 totalPayout = tokenIds.length * monthlyPayment;
+        console.log(monthlyPayment, "monthlyPayment");
+        uint256 totalPayout = tokenIds.length * monthlyPayment * 10 ** 6;
+
+        console.log("Total payout", totalPayout);
 
         IERC20 paymentToken = IERC20(property.paymentToken());
 

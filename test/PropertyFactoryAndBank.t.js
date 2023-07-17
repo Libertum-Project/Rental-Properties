@@ -342,4 +342,56 @@ describe("PropertyFactoryAndBank", function () {
       ).to.emit(propertyFactoryAndBank, "PassiveIncomePropertyCreated");
     });
   });
+
+  describe("Claiming monthly payouts", function () {
+    it("Should not allow a user to claim monthly payouts for inactive properties", async function () {
+      const { owner, propertyFactoryAndBank, mockUSDT } = await loadFixture(
+        deployPropertyFactoryAndBank
+      );
+
+      // Create a new capital repayment property
+      await propertyFactoryAndBank
+        .connect(owner)
+        .newCapitalRepaymentProperty(
+          "Test Property",
+          "TP",
+          100,
+          1000,
+          100000,
+          12,
+          500,
+          mockUSDT.address
+        );
+
+      // Mint 1000 USDT to owner
+      await mockUSDT.connect(owner).faucet(1_000);
+
+      // Create contract instance from stored address
+      const address = await propertyFactoryAndBank.capitalRepaymentProperties(
+        0
+      );
+      const CapitalRepaymentProperty = await ethers.getContractFactory(
+        "CapitalRepaymentProperty"
+      );
+      const capitalRepaymentProperty = await CapitalRepaymentProperty.attach(
+        address
+      );
+
+      // Buy a token
+      await mockUSDT
+        .connect(owner)
+        .approve(
+          capitalRepaymentProperty.address,
+          ethers.utils.parseUnits("1000", 6)
+        );
+      await capitalRepaymentProperty.connect(owner).mint(1);
+
+      // Try to claim monthly payouts
+      await expect(
+        propertyFactoryAndBank
+          .connect(owner)
+          .claimCapitalRepayment(address, [0])
+      ).to.be.revertedWith("PropertyFactoryAndBank: property is not active");
+    });
+  });
 });

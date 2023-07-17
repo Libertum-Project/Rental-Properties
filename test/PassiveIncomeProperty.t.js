@@ -193,9 +193,9 @@ describe("PassiveIncomeProperty", function () {
       );
 
       // Attempt to withdraw USDT and verify contract's USDT balance
-      await expect(passiveIncomeProperty.withdraw(owner.address)).to.be.revertedWith(
-        "PassiveIncomeProperty: no funds to withdraw"
-      );
+      await expect(
+        passiveIncomeProperty.withdraw(owner.address)
+      ).to.be.revertedWith("PassiveIncomeProperty: no funds to withdraw");
     });
   });
 

@@ -204,9 +204,9 @@ describe("CapitalRepaymentProperty", function () {
       );
 
       // Attempt to withdraw USDT and verify contract's USDT balance
-      await expect(capitalRepaymentProperty.withdraw(owner.address)).to.be.revertedWith(
-        "CapitalRepaymentProperty: no funds to withdraw"
-      );
+      await expect(
+        capitalRepaymentProperty.withdraw(owner.address)
+      ).to.be.revertedWith("CapitalRepaymentProperty: no funds to withdraw");
     });
   });
 

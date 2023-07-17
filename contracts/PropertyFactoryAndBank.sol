@@ -250,7 +250,7 @@ contract PropertyFactoryAndBank is Ownable {
     }
 
     // Allows the owner to withdraw funds stored in a capital repayment property
-    //  contract to a specified address.
+    // contract to a specified address.
     function withdrawFromCapitalRepaymentProperty(
         address from,
         address to
@@ -259,8 +259,8 @@ contract PropertyFactoryAndBank is Ownable {
         property.withdraw(to);
     }
 
-    // Allows the owner to withdraw funds stored in a capital repayment property
-    //  contract to a specified address.
+    // Allows the owner to withdraw funds stored in a passive income property
+    // contract to a specified address.
     function withdrawFromPassiveIncomeProperty(
         address from,
         address to

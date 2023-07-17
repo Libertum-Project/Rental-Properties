@@ -153,15 +153,15 @@ The properties of this contract can be accessed using the getter functions provi
 
 7. **name()** - returns the name of this property collection
 8. **symbol()** - returns the symbol of this property collection
-8. **currentToken()** - returns the next token id that will be minted
-9. **totalSupply()** - returns the total of tokens in this collection
-10. **pricePerToken()** - returns the price per token
-11. **collateralizedValue()** - returns the total collateralized value of the property
-12. **durationInMonths()** - returns the total duration of the loan, in months
-13. **interestRate()** - returns the monthly interest rate multiplied by 100
-14. **paymentToken()** - returns the address of the payment token accepted by the contract
-15. **isActive()** - returns a boolean representing whether payouts are active
-16. **startTime()** - returns a uint256 timestamp denoting when payouts started
+9. **currentToken()** - returns the next token id that will be minted
+10. **totalSupply()** - returns the total of tokens in this collection
+11. **pricePerToken()** - returns the price per token
+12. **collateralizedValue()** - returns the total collateralized value of the property
+13. **durationInMonths()** - returns the total duration of the loan, in months
+14. **interestRate()** - returns the monthly interest rate multiplied by 100
+15. **paymentToken()** - returns the address of the payment token accepted by the contract
+16. **isActive()** - returns a boolean representing whether payouts are active
+17. **startTime()** - returns a uint256 timestamp denoting when payouts started
 
 ## PassiveIncomeProperty
 
@@ -210,4 +210,3 @@ The property owner is able to terminate the passive income faucet at any time by
 17. **repayLoan** - attempts to transfer the specified quantity of the denoted currency to the contract and updates the outstanding amount accordingly, accepts one argument:
 
     - _uint256_ `amount` - the amount of USDT/USDC that the owner wishes to repay
-

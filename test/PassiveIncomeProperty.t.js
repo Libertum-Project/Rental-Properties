@@ -39,6 +39,13 @@ describe("PassiveIncomeProperty", function () {
       const { passiveIncomeProperty } = await loadFixture(deployPassiveIncome);
       expect(await passiveIncomeProperty.symbol()).to.equal("TP");
     });
+
+    it("Should set the right owner", async function () {
+      const { owner, passiveIncomeProperty } = await loadFixture(
+        deployPassiveIncome
+      );
+      expect(await passiveIncomeProperty.owner()).to.equal(owner.address);
+    });
   });
 
   describe("Minting", function () {

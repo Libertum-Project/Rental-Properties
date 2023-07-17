@@ -46,6 +46,13 @@ describe("CapitalRepaymentProperty", function () {
       );
       expect(await capitalRepaymentProperty.symbol()).to.equal("TP");
     });
+
+    it("Should set the right owner", async function () {
+      const { owner, capitalRepaymentProperty } = await loadFixture(
+        deployCapitalRepayment
+      );
+      expect(await capitalRepaymentProperty.owner()).to.equal(owner.address);
+    });
   });
 
   describe("Minting", function () {

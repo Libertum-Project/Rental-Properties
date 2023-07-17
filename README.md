@@ -101,3 +101,9 @@ These functions can be called by a user (aided by the frontend) to claim their m
 
    - _address_ `propertyAddress` - the address of the passive income property the user fractionally owns
    - _uint256[]_ `tokenIds` - an array of tokenIds owned by the user
+
+### Getter Functions
+
+9. **numCapitalRepaymentProperties** - this _view_ function returns the length of the `capitalRepaymentProperties` array which allows us to use the getter contained within that contract to iterate through the property array.
+
+10. **numPassiveIncomeProperties** - this _view_ function returns the length of the `passiveIncomeProperties` array which allows us to use the getter contained within that contract to iterate through the property array.

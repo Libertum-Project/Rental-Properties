@@ -237,5 +237,49 @@ describe("PropertyFactoryAndBank", function () {
           )
       ).to.be.revertedWith("Ownable: caller is not the owner");
     });
+
+    it("Should store the addresses of all properties created", async function () {
+      const { owner, propertyFactoryAndBank, mockUSDT } = await loadFixture(
+        deployPropertyFactoryAndBank
+      );
+
+      // Create a new passive income property
+      await propertyFactoryAndBank
+        .connect(owner)
+        .newPassiveIncomeProperty(
+          "Test Property",
+          "TP",
+          100,
+          1000,
+          100000,
+          500,
+          mockUSDT.address
+        );
+
+      // Create a new passive income property
+      await propertyFactoryAndBank
+        .connect(owner)
+        .newPassiveIncomeProperty(
+          "Test Property",
+          "TP",
+          100,
+          1000,
+          100000,
+          500,
+          mockUSDT.address
+        );
+
+      // Verify that the array is the correct length and each element does not contain
+      // the zero address.
+      const numProperties =
+        await propertyFactoryAndBank.numPassiveIncomeProperties();
+      expect(numProperties).to.equal(2);
+
+      for (let i = 0; i < numProperties; i++) {
+        let propertyAddress =
+          await propertyFactoryAndBank.passiveIncomeProperties(i);
+        expect(propertyAddress).to.not.equal(0);
+      }
+    });
   });
 });

@@ -8,6 +8,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract PropertyFactoryAndBank is Ownable {
     address[] public capitalRepaymentProperties;
 
+    event CapitalRepaymentPropertyCreated(address indexed propertyAddress);
+
     constructor() {}
 
     function newCapitalRepaymentProperty(
@@ -32,6 +34,7 @@ contract PropertyFactoryAndBank is Ownable {
         );
 
         capitalRepaymentProperties.push(address(property));
+        emit CapitalRepaymentPropertyCreated(address(property));
 
         return address(property);
     }

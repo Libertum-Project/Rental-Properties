@@ -15,6 +15,10 @@ contract CapitalRepaymentProperty is ERC721, Ownable {
 
     IERC20 public paymentToken;
 
+    // Tracks the state of the property (determines if claims are allowed)
+    bool public isActive;
+    uint256 public startTime;
+
     constructor(
         string memory name,
         string memory symbol,

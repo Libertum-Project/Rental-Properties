@@ -5,7 +5,6 @@ import "./CapitalRepaymentProperty.sol";
 import "./PassiveIncomeProperty.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "hardhat/console.sol";
 
 contract PropertyFactoryAndBank is Ownable {
     address[] public capitalRepaymentProperties;
@@ -116,7 +115,7 @@ contract PropertyFactoryAndBank is Ownable {
             if (lastClaimed == 0) {
                 // For first claims, set lastClaimed to 30 days after start time
                 require(
-                    property.startTime() + 30 days >= block.timestamp,
+                    property.startTime() + 30 days <= block.timestamp,
                     "PropertyFactoryAndBank: payout not ready"
                 );
                 property.setLastClaimed(
@@ -126,7 +125,7 @@ contract PropertyFactoryAndBank is Ownable {
             } else {
                 // For future claims, set lastClaimed to 30 days after last claim
                 require(
-                    lastClaimed + 30 days >= block.timestamp,
+                    lastClaimed + 30 days <= block.timestamp,
                     "PropertyFactoryAndBank: payout not ready"
                 );
             }
@@ -134,14 +133,10 @@ contract PropertyFactoryAndBank is Ownable {
 
         uint256 totalAmount = (property.collateralizedValue() *
             (10000 + property.interestRate())) / 10000;
-        console.log(totalAmount, "totalAmount");
         uint256 monthlyPayment = totalAmount /
             property.durationInMonths() /
             property.totalSupply();
-        console.log(monthlyPayment, "monthlyPayment");
         uint256 totalPayout = tokenIds.length * monthlyPayment * 10 ** 6;
-
-        console.log("Total payout", totalPayout);
 
         IERC20 paymentToken = IERC20(property.paymentToken());
 

@@ -52,7 +52,9 @@ describe("PropertyFactoryAndBank", function () {
           mockUSDT.address
         );
 
-      expect (await propertyFactoryAndBank.numCapitalRepaymentProperties()).to.equal(1);
+      expect(
+        await propertyFactoryAndBank.numCapitalRepaymentProperties()
+      ).to.equal(1);
     });
 
     it("Should not allow a user to create a new capital repayment property", async function () {
@@ -109,16 +111,63 @@ describe("PropertyFactoryAndBank", function () {
           500,
           mockUSDT.address
         );
-        
-        // Verify that the array is the correct length and each element does not contain
-        // the zero address.
-        const numProperties = await propertyFactoryAndBank.numCapitalRepaymentProperties();
-        expect(numProperties).to.equal(2);
-        
-        for (let i = 0; i < numProperties; i++) {
-          let propertyAddress = await propertyFactoryAndBank.capitalRepaymentProperties(i);
-          expect(propertyAddress).to.not.equal(0);
-        }
+
+      // Verify that the array is the correct length and each element does not contain
+      // the zero address.
+      const numProperties =
+        await propertyFactoryAndBank.numCapitalRepaymentProperties();
+      expect(numProperties).to.equal(2);
+
+      for (let i = 0; i < numProperties; i++) {
+        let propertyAddress =
+          await propertyFactoryAndBank.capitalRepaymentProperties(i);
+        expect(propertyAddress).to.not.equal(0);
+      }
+    });
+
+    it("Created properties should have the correct variables", async function () {
+      const { owner, propertyFactoryAndBank, mockUSDT } = await loadFixture(
+        deployPropertyFactoryAndBank
+      );
+
+      // Create a new capital repayment property
+      await propertyFactoryAndBank
+        .connect(owner)
+        .newCapitalRepaymentProperty(
+          "Test Property",
+          "TP",
+          100,
+          1000,
+          100000,
+          12,
+          500,
+          mockUSDT.address
+        );
+
+      // Create contract instance from stored address
+      const address = await propertyFactoryAndBank.capitalRepaymentProperties(
+        0
+      );
+      const CapitalRepaymentProperty = await ethers.getContractFactory(
+        "CapitalRepaymentProperty"
+      );
+      const capitalRepaymentProperty = await CapitalRepaymentProperty.attach(
+        address
+      );
+
+      // Verify that the contract has the correct variables
+      expect(await capitalRepaymentProperty.name()).to.equal("Test Property");
+      expect(await capitalRepaymentProperty.symbol()).to.equal("TP");
+      expect(await capitalRepaymentProperty.totalSupply()).to.equal(100);
+      expect(await capitalRepaymentProperty.pricePerToken()).to.equal(1000);
+      expect(await capitalRepaymentProperty.collateralizedValue()).to.equal(
+        100000
+      );
+      expect(await capitalRepaymentProperty.durationInMonths()).to.equal(12);
+      expect(await capitalRepaymentProperty.interestRate()).to.equal(500);
+      expect(await capitalRepaymentProperty.paymentToken()).to.equal(
+        mockUSDT.address
+      );
     });
   });
 });

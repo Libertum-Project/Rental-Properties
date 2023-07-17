@@ -152,6 +152,10 @@ contract PropertyFactoryAndBank is Ownable {
                     lastClaimed + 30 days <= block.timestamp,
                     "PropertyFactoryAndBank: payout not ready"
                 );
+                property.setLastClaimed(
+                    tokenIds[i],
+                    lastClaimed + 30 days
+                );
             }
         }
 
@@ -172,6 +176,67 @@ contract PropertyFactoryAndBank is Ownable {
             paymentToken.transfer(msg.sender, totalPayout),
             "PropertyFactoryAndBank: transfer failed"
         );
+    }
+
+    function claimPassiveIncome(address propertyAddress, uint256[] memory tokenIds) external {
+        PassiveIncomeProperty property = PassiveIncomeProperty(
+            propertyAddress
+        );
+        require(
+            property.isActive(),
+            "PropertyFactoryAndBank: property is not active"
+        );
+
+        // Check for ownership and claim eligibility for each tokenId in the array
+        for (uint256 i = 0; i < tokenIds.length; i++) {
+            require(
+                property.ownerOf(tokenIds[i]) == msg.sender,
+                "PropertyFactoryAndBank: caller is not owner of token"
+            );
+
+            uint256 lastClaimed = property.lastClaimed(tokenIds[i]);
+
+            // NOTE: setting lastClaimed to 30 days after last claim prevents the need
+            // for timely claims.
+            if (lastClaimed == 0) {
+                // For first claims, set lastClaimed to 30 days after start time
+                require(
+                    property.startTime() + 30 days <= block.timestamp,
+                    "PropertyFactoryAndBank: payout not ready"
+                );
+                property.setLastClaimed(
+                    tokenIds[i],
+                    property.startTime() + 30 days
+                );
+            } else {
+                // For future claims, set lastClaimed to 30 days after last claim
+                require(
+                    lastClaimed + 30 days <= block.timestamp,
+                    "PropertyFactoryAndBank: payout not ready"
+                );
+                property.setLastClaimed(
+                    tokenIds[i],
+                    lastClaimed + 30 days
+                );
+            }
+        }
+
+        uint256 totalAmount = (property.collateralizedValue() *
+            (10000 + property.interestRate())) / 10000;
+        uint256 monthlyPayment = totalAmount /
+            property.totalSupply();
+        uint256 totalPayout = tokenIds.length * monthlyPayment * 10 ** 6;
+
+        IERC20 paymentToken = IERC20(property.paymentToken());
+
+        require(
+            paymentToken.balanceOf(address(this)) >= totalPayout,
+            "PropertyFactoryAndBank: insufficient funds"
+        );
+        require(
+            paymentToken.transfer(msg.sender, totalPayout),
+            "PropertyFactoryAndBank: transfer failed"
+        );       
     }
 
     function numCapitalRepaymentProperties() external view returns (uint256) {

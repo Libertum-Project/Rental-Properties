@@ -347,7 +347,7 @@ describe("PropertyFactoryAndBank", function () {
   });
 
   describe("Claiming monthly payouts", function () {
-    it("Should not allow a user to claim monthly payouts for inactive properties", async function () {
+    it("(Capital Repayment) Should not allow a user to claim monthly payouts for inactive properties", async function () {
       const { owner, propertyFactoryAndBank, mockUSDT } = await loadFixture(
         deployPropertyFactoryAndBank
       );
@@ -397,7 +397,7 @@ describe("PropertyFactoryAndBank", function () {
       ).to.be.revertedWith("PropertyFactoryAndBank: property is not active");
     });
 
-    it("Should not allow a user to claim monthly payouts if contract has insufficient funds", async function () {
+    it("(Capital Repayment) Should not allow a user to claim monthly payouts if contract has insufficient funds", async function () {
       const { owner, propertyFactoryAndBank, mockUSDT } = await loadFixture(
         deployPropertyFactoryAndBank
       );
@@ -455,7 +455,7 @@ describe("PropertyFactoryAndBank", function () {
       ).to.be.revertedWith("PropertyFactoryAndBank: insufficient funds");
     });
 
-    it("Should not allow a user to claim monthly payouts if insufficient time has elapsed", async function () {
+    it("(Capital Repayment) Should not allow a user to claim monthly payouts if insufficient time has elapsed", async function () {
       const { owner, propertyFactoryAndBank, mockUSDT } = await loadFixture(
         deployPropertyFactoryAndBank
       );
@@ -478,7 +478,10 @@ describe("PropertyFactoryAndBank", function () {
       await mockUSDT.connect(owner).faucet(2_000);
       await mockUSDT
         .connect(owner)
-        .transfer(propertyFactoryAndBank.address, ethers.utils.parseUnits("1000", 6));
+        .transfer(
+          propertyFactoryAndBank.address,
+          ethers.utils.parseUnits("1000", 6)
+        );
 
       // Create contract instance from stored address
       const address = await propertyFactoryAndBank.capitalRepaymentProperties(
@@ -505,14 +508,144 @@ describe("PropertyFactoryAndBank", function () {
         .connect(owner)
         .setActiveCapitalRepayment(address);
 
-      console.log(await mockUSDT.balanceOf(propertyFactoryAndBank.address));
-
       // Attempt to claim
       await expect(
         propertyFactoryAndBank
           .connect(owner)
           .claimCapitalRepayment(address, [0])
       ).to.be.revertedWith("PropertyFactoryAndBank: payout not ready");
+    });
+
+    it("(Capital Repayment) Should allow a user to claim monthly payouts if sufficient time has elapsed", async function () {
+      const { owner, propertyFactoryAndBank, mockUSDT } = await loadFixture(
+        deployPropertyFactoryAndBank
+      );
+
+      // Create a new capital repayment property
+      await propertyFactoryAndBank
+        .connect(owner)
+        .newCapitalRepaymentProperty(
+          "Test Property",
+          "TP",
+          100,
+          1000,
+          100000,
+          12,
+          500,
+          mockUSDT.address
+        );
+
+      // Mint 2k USDT to owner and transfer 1k to contract
+      await mockUSDT.connect(owner).faucet(2_000);
+      await mockUSDT
+        .connect(owner)
+        .transfer(
+          propertyFactoryAndBank.address,
+          ethers.utils.parseUnits("1000", 6)
+        );
+
+      // Create contract instance from stored address
+      const address = await propertyFactoryAndBank.capitalRepaymentProperties(
+        0
+      );
+      const CapitalRepaymentProperty = await ethers.getContractFactory(
+        "CapitalRepaymentProperty"
+      );
+      const capitalRepaymentProperty = await CapitalRepaymentProperty.attach(
+        address
+      );
+
+      // Buy a token
+      await mockUSDT
+        .connect(owner)
+        .approve(
+          capitalRepaymentProperty.address,
+          ethers.utils.parseUnits("1000", 6)
+        );
+      await capitalRepaymentProperty.connect(owner).mint(1);
+
+      // Activate the property
+      await propertyFactoryAndBank
+        .connect(owner)
+        .setActiveCapitalRepayment(address);
+
+      // Increase time by 30 days
+      await time.increase(30 * 24 * 60 * 60);
+
+      // Attempt to claim
+      await propertyFactoryAndBank
+        .connect(owner)
+        .claimCapitalRepayment(address, [0]);
+
+      expect(await mockUSDT.balanceOf(owner.address)).to.equal(
+        ethers.utils.parseUnits("87", 6)
+      );
+    });
+
+    it("(Capital Repayment) Should allow a user to claim monthly payouts for multiple tokens at once", async function () {
+      const { owner, propertyFactoryAndBank, mockUSDT } = await loadFixture(
+        deployPropertyFactoryAndBank
+      );
+
+      // Create a new capital repayment property
+      await propertyFactoryAndBank
+        .connect(owner)
+        .newCapitalRepaymentProperty(
+          "Test Property",
+          "TP",
+          100,
+          1000,
+          100000,
+          12,
+          500,
+          mockUSDT.address
+        );
+
+      // Mint 3k USDT to owner and transfer 1k to contract
+      await mockUSDT.connect(owner).faucet(3_000);
+      await mockUSDT
+        .connect(owner)
+        .transfer(
+          propertyFactoryAndBank.address,
+          ethers.utils.parseUnits("1000", 6)
+        );
+
+      // Create contract instance from stored address
+      const address = await propertyFactoryAndBank.capitalRepaymentProperties(
+        0
+      );
+      const CapitalRepaymentProperty = await ethers.getContractFactory(
+        "CapitalRepaymentProperty"
+      );
+      const capitalRepaymentProperty = await CapitalRepaymentProperty.attach(
+        address
+      );
+
+      // Buy a token
+      await mockUSDT
+        .connect(owner)
+        .approve(
+          capitalRepaymentProperty.address,
+          ethers.utils.parseUnits("2000", 6)
+        );
+      await capitalRepaymentProperty.connect(owner).mint(2);
+
+      // Activate the property
+      await propertyFactoryAndBank
+        .connect(owner)
+        .setActiveCapitalRepayment(address);
+
+      // Increase time by 30 days
+      await time.increase(30 * 24 * 60 * 60);
+
+      // Attempt to claim
+      await propertyFactoryAndBank
+        .connect(owner)
+        .claimCapitalRepayment(address, [0, 1]);
+
+      expect(await mockUSDT.balanceOf(owner.address)).to.equal(
+        ethers.utils.parseUnits("174", 6)
+      );
     });
   });
 });

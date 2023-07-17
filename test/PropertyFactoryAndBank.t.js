@@ -803,5 +803,70 @@ describe("PropertyFactoryAndBank", function () {
           .claimPassiveIncome(address, [0])
       ).to.be.revertedWith("PropertyFactoryAndBank: payout not ready");
     });
+
+    it("(Passive Income) Should allow a user to claim monthly payouts if sufficient time has elapsed", async function () {
+      const { owner, propertyFactoryAndBank, mockUSDT } = await loadFixture(
+        deployPropertyFactoryAndBank
+      );
+
+      // Create a new Passive Income property
+      await propertyFactoryAndBank
+        .connect(owner)
+        .newPassiveIncomeProperty(
+          "Test Property",
+          "TP",
+          100,
+          1000,
+          100000,
+          50,
+          mockUSDT.address
+        );
+
+      // Mint 2k USDT to owner and transfer 1k to contract
+      await mockUSDT.connect(owner).faucet(2_000);
+      await mockUSDT
+        .connect(owner)
+        .transfer(
+          propertyFactoryAndBank.address,
+          ethers.utils.parseUnits("1000", 6)
+        );
+
+      // Create contract instance from stored address
+      const address = await propertyFactoryAndBank.passiveIncomeProperties(
+        0
+      );
+      const PassiveIncomeProperty = await ethers.getContractFactory(
+        "PassiveIncomeProperty"
+      );
+      const passiveIncomeProperty = await PassiveIncomeProperty.attach(
+        address
+      );
+
+      // Buy a token
+      await mockUSDT
+        .connect(owner)
+        .approve(
+          passiveIncomeProperty.address,
+          ethers.utils.parseUnits("1000", 6)
+        );
+      await passiveIncomeProperty.connect(owner).mint(1);
+
+      // Activate the property
+      await propertyFactoryAndBank
+        .connect(owner)
+        .setActivePassiveIncome(address);
+
+      // Increase time by 30 days
+      await time.increase(30 * 24 * 60 * 60);
+
+      // Attempt to claim
+      await propertyFactoryAndBank
+        .connect(owner)
+        .claimPassiveIncome(address, [0]);
+
+      expect(await mockUSDT.balanceOf(owner.address)).to.equal(
+        ethers.utils.parseUnits("5", 6)
+      );
+    });
   });
 });

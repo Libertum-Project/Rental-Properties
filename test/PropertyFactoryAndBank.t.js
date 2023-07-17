@@ -11,16 +11,24 @@ describe("PropertyFactoryAndBank", function () {
     const PropertyFactoryAndBank = await ethers.getContractFactory(
       "PropertyFactoryAndBank"
     );
-    const propertyFactoryAndBank = await PropertyFactoryAndBank.deploy(
-      "Test Property",
-      "TP",
-      100,
-      1000,
-      100000,
-      500,
-      mockUSDT.address
-    );
+    const propertyFactoryAndBank = await PropertyFactoryAndBank.deploy();
 
-    return { owner, user, deployPropertyFactoryAndBank, mockUSDT };
+    return { owner, user, propertyFactoryAndBank, mockUSDT };
   }
+
+  describe("Deployment", function () {
+    it("Should deploy the contract", async function () {
+      const { propertyFactoryAndBank } = await loadFixture(
+        deployPropertyFactoryAndBank
+      );
+      expect(propertyFactoryAndBank.address).to.not.equal(0);
+    });
+
+    it("Should set the right owner", async function () {
+      const { owner, propertyFactoryAndBank } = await loadFixture(
+        deployPropertyFactoryAndBank
+      );
+      expect(await propertyFactoryAndBank.owner()).to.equal(owner.address);
+    });
+  });
 });

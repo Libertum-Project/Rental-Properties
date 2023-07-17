@@ -320,5 +320,26 @@ describe("PropertyFactoryAndBank", function () {
         mockUSDT.address
       );
     });
+
+    it("Should correctly emit an event for each created property", async function () {
+      const { owner, propertyFactoryAndBank, mockUSDT } = await loadFixture(
+        deployPropertyFactoryAndBank
+      );
+
+      // Create a new passive income property and check for event emission
+      await expect(
+        propertyFactoryAndBank
+          .connect(owner)
+          .newPassiveIncomeProperty(
+            "Test Property",
+            "TP",
+            100,
+            1000,
+            100000,
+            500,
+            mockUSDT.address
+          )
+      ).to.emit(propertyFactoryAndBank, "PassiveIncomePropertyCreated");
+    });
   });
 });

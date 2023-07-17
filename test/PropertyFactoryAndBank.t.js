@@ -692,5 +692,56 @@ describe("PropertyFactoryAndBank", function () {
           .claimCapitalRepayment(address, [0])
       ).to.be.revertedWith("PropertyFactoryAndBank: property is not active");
     });
+
+    it("(Passive Income) Should not allow a user to claim monthly payouts if contract has insufficient funds", async function () {
+      const { owner, propertyFactoryAndBank, mockUSDT } = await loadFixture(
+        deployPropertyFactoryAndBank
+      );
+
+      // Create a new Passive Income property
+      await propertyFactoryAndBank
+        .connect(owner)
+        .newPassiveIncomeProperty(
+          "Test Property",
+          "TP",
+          100,
+          1000,
+          100000,
+          50,
+          mockUSDT.address
+        );
+
+      // Mint 1000 USDT to owner
+      await mockUSDT.connect(owner).faucet(1_000);
+
+      // Create contract instance from stored address
+      const address = await propertyFactoryAndBank.passiveIncomeProperties(0);
+      const PassiveIncomeProperty = await ethers.getContractFactory(
+        "PassiveIncomeProperty"
+      );
+      const passiveIncomeProperty = await PassiveIncomeProperty.attach(address);
+
+      // Buy a token
+      await mockUSDT
+        .connect(owner)
+        .approve(
+          passiveIncomeProperty.address,
+          ethers.utils.parseUnits("1000", 6)
+        );
+      await passiveIncomeProperty.connect(owner).mint(1);
+
+      // Activate the property
+      await propertyFactoryAndBank
+        .connect(owner)
+        .setActivePassiveIncome(address);
+
+      // Increase time by 30 days
+      await time.increase(30 * 24 * 60 * 60);
+
+      // Attempt to claim
+      await expect(
+        propertyFactoryAndBank.connect(owner).claimPassiveIncome(address, [0])
+      ).to.be.revertedWith("PropertyFactoryAndBank: insufficient funds");
+    });
   });
 });

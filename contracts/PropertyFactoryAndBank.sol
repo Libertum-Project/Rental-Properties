@@ -129,6 +129,13 @@ contract PropertyFactoryAndBank is Ownable {
             );
 
             uint256 lastClaimed = property.lastClaimed(tokenIds[i]);
+            uint256 numberOfClaims = property.numberOfClaims(tokenIds[i]);
+
+            // Check that the number of monthly claims do not exceed the duration
+            require(
+                numberOfClaims <= property.durationInMonths(),
+                "PropertyFactoryAndBank: all claims have been made"
+            );
 
             // NOTE: setting lastClaimed to 30 days after last claim prevents the need
             // for timely claims.
@@ -150,6 +157,9 @@ contract PropertyFactoryAndBank is Ownable {
                 );
                 property.setLastClaimed(tokenIds[i], lastClaimed + 30 days);
             }
+
+            // Increment number of claims on the token
+            property.setNumberOfClaims(tokenIds[i], numberOfClaims + 1);
         }
 
         // Compute the total payout for the user and transfer the funds

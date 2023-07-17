@@ -54,5 +54,27 @@ describe("PropertyFactoryAndBank", function () {
 
       expect (await propertyFactoryAndBank.numCapitalRepaymentProperties()).to.equal(1);
     });
+
+    it("Should not allow a user to create a new capital repayment property", async function () {
+      const { user, propertyFactoryAndBank, mockUSDT } = await loadFixture(
+        deployPropertyFactoryAndBank
+      );
+
+      // Create a new capital repayment property
+      await expect(
+        propertyFactoryAndBank
+          .connect(user)
+          .newCapitalRepaymentProperty(
+            "Test Property",
+            "TP",
+            100,
+            1000,
+            100000,
+            12,
+            500,
+            mockUSDT.address
+          )
+      ).to.be.revertedWith("Ownable: caller is not the owner");
+    });
   });
 });

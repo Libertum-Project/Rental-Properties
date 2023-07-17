@@ -68,11 +68,11 @@ contract CapitalRepaymentProperty is ERC721, Ownable {
         }
     }
 
-    function withdraw() external onlyOwner {
+    function withdraw(address to) external onlyOwner {
         // Allow the owner (factory) to withdraw all funds from the contract
         uint256 balance = paymentToken.balanceOf(address(this));
         require(balance > 0, "CapitalRepaymentProperty: no funds to withdraw");
-        paymentToken.transfer(owner(), balance);
+        paymentToken.transfer(address(to), balance);
     }
 
     function setActive() external onlyOwner {

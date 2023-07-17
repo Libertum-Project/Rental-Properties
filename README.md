@@ -1,13 +1,33 @@
-# Sample Hardhat Project
+# Rental Properties Smart Contracts
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+This repository contains 3 contracts for launching property collections.
 
-Try running some of the following tasks:
+- [**PropertyFactoryAndBank**](contracts/PropertyFactoryAndBank.sol)
+- [**CapitalRepaymentProperty**](contracts/CapitalRepaymentProperty.sol)
+- [**PassiveIncomeProperty**](contracts/PassiveIncomeProperty.sol)
 
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.ts
+## Dev Setup
+
+Run `npm install` to install all the necessary dependencies.
+
+Run `npx hardhat test` to run the test suite for all the contracts.
+
+The contracts can be deployed using the [`deploy.js`](scripts/deploy.js) script as follows,
+
 ```
+npx hardhat run scripts/deploy.js
+```
+
+but this deploys an ephemeral version of the contracts that cannot be interacted with. For development, consider first using
+
+```
+npx hardhat node
+```
+
+to spin up a Hardhat local network. Then use
+
+```
+npx hardhat run scripts/deploy.js --network localhost
+```
+
+in order to deploy the contracts onto our local blockchain.

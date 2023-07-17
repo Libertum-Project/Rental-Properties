@@ -69,6 +69,7 @@ contract PropertyFactoryAndBank is Ownable {
         return address(property);
     }
 
+    // Activates capital repayment payouts for property deployed at address
     function setActiveCapitalRepayment(
         address propertyAddress
     ) external onlyOwner {
@@ -79,10 +80,33 @@ contract PropertyFactoryAndBank is Ownable {
         property.setActive();
     }
 
+    // De-activates capital repayment payouts for property deployed at address
     function setInactiveCapitalRepayment(
         address propertyAddress
     ) external onlyOwner {
         CapitalRepaymentProperty property = CapitalRepaymentProperty(
+            propertyAddress
+        );
+
+        property.setInactive();
+    }
+
+    // Activates passive income payouts for property deployed at address
+    function setActivePassiveIncome(
+        address propertyAddress
+    ) external onlyOwner {
+        PassiveIncomeProperty property = PassiveIncomeProperty(
+            propertyAddress
+        );
+
+        property.setActive();
+    }
+
+    // De-activates passive income payouts for property deployed at address
+    function setInactivePassiveIncome(
+        address propertyAddress
+    ) external onlyOwner {
+        PassiveIncomeProperty property = PassiveIncomeProperty(
             propertyAddress
         );
 

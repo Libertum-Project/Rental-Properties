@@ -281,5 +281,44 @@ describe("PropertyFactoryAndBank", function () {
         expect(propertyAddress).to.not.equal(0);
       }
     });
+
+    it("Created properties should have the correct variables", async function () {
+      const { owner, propertyFactoryAndBank, mockUSDT } = await loadFixture(
+        deployPropertyFactoryAndBank
+      );
+
+      // Create a new passive income property
+      await propertyFactoryAndBank
+        .connect(owner)
+        .newPassiveIncomeProperty(
+          "Test Property",
+          "TP",
+          100,
+          1000,
+          100000,
+          500,
+          mockUSDT.address
+        );
+
+      // Create contract instance from stored address
+      const address = await propertyFactoryAndBank.passiveIncomeProperties(0);
+      const PassiveIncomeProperty = await ethers.getContractFactory(
+        "PassiveIncomeProperty"
+      );
+      const passiveIncomeProperty = await PassiveIncomeProperty.attach(address);
+
+      // Verify that the contract has the correct variables
+      expect(await passiveIncomeProperty.name()).to.equal("Test Property");
+      expect(await passiveIncomeProperty.symbol()).to.equal("TP");
+      expect(await passiveIncomeProperty.totalSupply()).to.equal(100);
+      expect(await passiveIncomeProperty.pricePerToken()).to.equal(1000);
+      expect(await passiveIncomeProperty.collateralizedValue()).to.equal(
+        100000
+      );
+      expect(await passiveIncomeProperty.interestRate()).to.equal(500);
+      expect(await passiveIncomeProperty.paymentToken()).to.equal(
+        mockUSDT.address
+      );
+    });
   });
 });

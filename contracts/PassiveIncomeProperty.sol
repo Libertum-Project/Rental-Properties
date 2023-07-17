@@ -17,6 +17,7 @@ contract PassiveIncomeProperty is ERC721, Ownable {
     // Tracks the state of the property (determines if claims are allowed)
     bool public isActive;
     uint256 public startTime;
+    mapping(uint256 => uint256) public lastClaimed;
     uint256 public unpaidAmount;
 
     constructor(
@@ -103,5 +104,13 @@ contract PassiveIncomeProperty is ERC721, Ownable {
             // Passive income stops after the loan has been fully paid
             isActive = false;
         }
+    }
+
+    function setLastClaimed(
+        uint256 tokenId,
+        uint256 timestamp
+    ) external onlyOwner {
+        // Allow the owner (factory) to set the last claimed timestamp for a token
+        lastClaimed[tokenId] = timestamp;
     }
 }

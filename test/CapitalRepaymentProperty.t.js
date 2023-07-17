@@ -209,4 +209,42 @@ describe("CapitalRepaymentProperty", function () {
       );
     });
   });
+
+  describe("Starting and stopping payouts", function () {
+    it("Should allow the owner to activate/deactivate a property", async function () {
+      const { owner, capitalRepaymentProperty } = await loadFixture(
+        deployCapitalRepayment
+      );
+
+      expect(await capitalRepaymentProperty.isActive()).to.equal(false);
+      await capitalRepaymentProperty.setActive();
+      expect(await capitalRepaymentProperty.isActive()).to.equal(true);
+      await capitalRepaymentProperty.setInactive();
+      expect(await capitalRepaymentProperty.isActive()).to.equal(false);
+    });
+
+    it("Should not allow a user to activate/deactivate a property", async function () {
+      const { user, capitalRepaymentProperty } = await loadFixture(
+        deployCapitalRepayment
+      );
+
+      expect(await capitalRepaymentProperty.isActive()).to.equal(false);
+      await expect(
+        capitalRepaymentProperty.connect(user).setActive()
+      ).to.be.revertedWith("Ownable: caller is not the owner");
+      expect(await capitalRepaymentProperty.isActive()).to.equal(false);
+    });
+
+    it("Should correctly set startTime when activating a property", async function () {
+      const { owner, capitalRepaymentProperty } = await loadFixture(
+        deployCapitalRepayment
+      );
+
+      await capitalRepaymentProperty.setActive();
+      const currentBlock = await ethers.provider.getBlock("latest");
+      expect(await capitalRepaymentProperty.startTime()).to.equal(
+        currentBlock.timestamp
+      );
+    });
+  });
 });

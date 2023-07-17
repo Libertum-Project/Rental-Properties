@@ -151,12 +151,63 @@ The user is able to mint NFTs belonging to the collection provided that:
 
 The properties of this contract can be accessed using the getter functions provided by Solidity for most variables.
 
-7. **currentToken()** - returns the next token id that will be minted
-8. **totalSupply()** - returns the total of tokens in this collection
-9. **pricePerToken()** - returns the price per token
-10. **collateralizedValue()** - returns the total collateralized value of the property
-11. **durationInMonths()** - returns the total duration of the loan, in months
+7. **name()** - returns the name of this property collection
+8. **symbol()** - returns the symbol of this property collection
+8. **currentToken()** - returns the next token id that will be minted
+9. **totalSupply()** - returns the total of tokens in this collection
+10. **pricePerToken()** - returns the price per token
+11. **collateralizedValue()** - returns the total collateralized value of the property
+12. **durationInMonths()** - returns the total duration of the loan, in months
+13. **interestRate()** - returns the monthly interest rate multiplied by 100
+14. **paymentToken()** - returns the address of the payment token accepted by the contract
+15. **isActive()** - returns a boolean representing whether payouts are active
+16. **startTime()** - returns a uint256 timestamp denoting when payouts started
+
+## PassiveIncomeProperty
+
+### External Contract Functions
+
+This contract contains functions used by the bank contract:
+
+1. `withdraw(address to)`
+2. `setActive()`
+3. `setInactive()`
+4. `setLastClaimed(uint256 tokenId, uint256 timestamp)`
+
+These cannot be called by anybody else except the bank contract, which owns the contract it created.f
+
+### User Minting
+
+The user is able to mint NFTs belonging to the collection provided that:
+
+- The tokens are not sold out
+- They have approved the contract for the requisite amount of USDT/USDC needed to purchase NFT(s)
+
+5. **mint** - prior to calling this function on the frontend, be sure to request approval from the user for the contract to spend _x_ stablecoin as defined by the contract, or the transaction will fail because of insufficient allowance. The number _x_ can be computed by `quantity * pricePerToken * 10**6` (note that all stablecoins have 6 decimal places). This function accepts one argument:
+
+   - _uint256_ `quantity` - the number of NFTs the user wishes to purchase
+
+### Getter Functions
+
+The properties of this contract can be accessed using the getter functions provided by Solidity for most variables.
+
+6. **name()** - returns the name of this property collection
+7. **symbol()** - returns the symbol of this property collection
+8. **currentToken()** - returns the next token id that will be minted
+9. **totalSupply()** - returns the total of tokens in this collection
+10. **pricePerToken()** - returns the price per token
+11. **collateralizedValue()** - returns the total collateralized value of the property
 12. **interestRate()** - returns the monthly interest rate multiplied by 100
 13. **paymentToken()** - returns the address of the payment token accepted by the contract
 14. **isActive()** - returns a boolean representing whether payouts are active
 15. **startTime()** - returns a uint256 timestamp denoting when payouts started
+16. **unpaidAmount()** - returns a uint256 value of the outstanding amount owed by the property owner
+
+### Loan Repayment
+
+The property owner is able to terminate the passive income faucet at any time by paying back the entire collateralized value in full (monthly passive income that has been collected by fractionalized owners of the collection not included). When `unpaidAmount` reaches 0, `isActive` is set to `false`, denoting the end of the passive income faucet.
+
+17. **repayLoan** - attempts to transfer the specified quantity of the denoted currency to the contract and updates the outstanding amount accordingly, accepts one argument:
+
+    - _uint256_ `amount` - the amount of USDT/USDC that the owner wishes to repay
+

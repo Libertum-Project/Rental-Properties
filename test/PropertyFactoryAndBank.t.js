@@ -175,7 +175,7 @@ describe("PropertyFactoryAndBank", function () {
         deployPropertyFactoryAndBank
       );
 
-      // Create a new capital repayment property
+      // Create a new capital repayment property and check for event emission
       await expect(
         propertyFactoryAndBank
           .connect(owner)
@@ -189,8 +189,32 @@ describe("PropertyFactoryAndBank", function () {
             500,
             mockUSDT.address
           )
-      )
-        .to.emit(propertyFactoryAndBank, "CapitalRepaymentPropertyCreated")
+      ).to.emit(propertyFactoryAndBank, "CapitalRepaymentPropertyCreated");
+    });
+  });
+
+  describe("Creating new passive income properties", function () {
+    it("Should allow the owner to create a new passive income property", async function () {
+      const { owner, propertyFactoryAndBank, mockUSDT } = await loadFixture(
+        deployPropertyFactoryAndBank
+      );
+
+      // Create a new passive income property
+      await propertyFactoryAndBank
+        .connect(owner)
+        .newPassiveIncomeProperty(
+          "Test Property",
+          "TP",
+          100,
+          1000,
+          100000,
+          500,
+          mockUSDT.address
+        );
+
+      expect(
+        await propertyFactoryAndBank.numPassiveIncomeProperties()
+      ).to.equal(1);
     });
   });
 });

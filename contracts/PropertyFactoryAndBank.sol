@@ -69,4 +69,8 @@ contract PropertyFactoryAndBank is Ownable {
     function numCapitalRepaymentProperties() external view returns (uint256) {
         return capitalRepaymentProperties.length;
     }
+
+    function numPassiveIncomeProperties() external view returns (uint256) {
+        return passiveIncomeProperties.length;
+    }
 }

@@ -159,6 +159,7 @@ contract PropertyFactoryAndBank is Ownable {
             }
         }
 
+        // Compute the total payout for the user and transfer the funds
         uint256 totalAmount = (property.collateralizedValue() *
             (10000 + property.interestRate())) / 10000;
         uint256 monthlyPayment = totalAmount /
@@ -221,8 +222,9 @@ contract PropertyFactoryAndBank is Ownable {
             }
         }
 
-        uint256 totalAmount = (property.collateralizedValue() *
-            (10000 + property.interestRate())) / 10000;
+        // Compute the total payout for the user and transfer the funds
+        uint256 totalAmount = property.collateralizedValue() *
+            property.interestRate() / 10000;
         uint256 monthlyPayment = totalAmount /
             property.totalSupply();
         uint256 totalPayout = tokenIds.length * monthlyPayment * 10 ** 6;

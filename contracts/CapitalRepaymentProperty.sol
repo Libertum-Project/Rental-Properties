@@ -7,11 +7,11 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract CapitalRepaymentProperty is ERC721, Ownable {
     uint256 public currentToken;
-    uint256 public totalSupply;
-    uint256 public pricePerToken;
-    uint256 public collateralizedValue;
-    uint256 public durationInMonths;
-    uint256 public interestRate;
+    uint256 public immutable totalSupply;
+    uint256 public immutable pricePerToken;
+    uint256 public immutable collateralizedValue;
+    uint256 public immutable durationInMonths;
+    uint256 public immutable interestRate;
 
     IERC20 public paymentToken;
 

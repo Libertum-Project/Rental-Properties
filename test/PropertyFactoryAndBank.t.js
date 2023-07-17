@@ -216,5 +216,26 @@ describe("PropertyFactoryAndBank", function () {
         await propertyFactoryAndBank.numPassiveIncomeProperties()
       ).to.equal(1);
     });
+
+    it("Should not allow a user to create a new passive income property", async function () {
+      const { user, propertyFactoryAndBank, mockUSDT } = await loadFixture(
+        deployPropertyFactoryAndBank
+      );
+
+      // Create a new passive income property
+      await expect(
+        propertyFactoryAndBank
+          .connect(user)
+          .newPassiveIncomeProperty(
+            "Test Property",
+            "TP",
+            100,
+            1000,
+            100000,
+            500,
+            mockUSDT.address
+          )
+      ).to.be.revertedWith("Ownable: caller is not the owner");
+    });
   });
 });

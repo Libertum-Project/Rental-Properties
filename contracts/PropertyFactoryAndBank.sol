@@ -248,4 +248,24 @@ contract PropertyFactoryAndBank is Ownable {
     function numPassiveIncomeProperties() external view returns (uint256) {
         return passiveIncomeProperties.length;
     }
+
+    // Allows the owner to withdraw funds stored in a capital repayment property
+    //  contract to a specified address.
+    function withdrawFromCapitalRepaymentProperty(
+        address from,
+        address to
+    ) external onlyOwner {
+        CapitalRepaymentProperty property = CapitalRepaymentProperty(from);
+        property.withdraw(to);
+    }
+
+    // Allows the owner to withdraw funds stored in a capital repayment property
+    //  contract to a specified address.
+    function withdrawFromPassiveIncomeProperty(
+        address from,
+        address to
+    ) external onlyOwner {
+        PassiveIncomeProperty property = PassiveIncomeProperty(from);
+        property.withdraw(to);
+    }
 }

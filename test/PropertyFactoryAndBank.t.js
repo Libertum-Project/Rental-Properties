@@ -169,5 +169,28 @@ describe("PropertyFactoryAndBank", function () {
         mockUSDT.address
       );
     });
+
+    it("Should correctly emit an event for each created property", async function () {
+      const { owner, propertyFactoryAndBank, mockUSDT } = await loadFixture(
+        deployPropertyFactoryAndBank
+      );
+
+      // Create a new capital repayment property
+      await expect(
+        propertyFactoryAndBank
+          .connect(owner)
+          .newCapitalRepaymentProperty(
+            "Test Property",
+            "TP",
+            100,
+            1000,
+            100000,
+            12,
+            500,
+            mockUSDT.address
+          )
+      )
+        .to.emit(propertyFactoryAndBank, "CapitalRepaymentPropertyCreated")
+    });
   });
 });

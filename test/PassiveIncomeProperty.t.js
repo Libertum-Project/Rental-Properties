@@ -198,4 +198,115 @@ describe("PassiveIncomeProperty", function () {
       );
     });
   });
+
+  describe("Starting and stopping payouts", function () {
+    it("Should allow the owner to activate/deactivate a property", async function () {
+      const { owner, passiveIncomeProperty } = await loadFixture(
+        deployPassiveIncome
+      );
+
+      expect(await passiveIncomeProperty.isActive()).to.equal(false);
+      await passiveIncomeProperty.setActive();
+      expect(await passiveIncomeProperty.isActive()).to.equal(true);
+      await passiveIncomeProperty.setInactive();
+      expect(await passiveIncomeProperty.isActive()).to.equal(false);
+    });
+
+    it("Should not allow a user to activate/deactivate a property", async function () {
+      const { user, passiveIncomeProperty } = await loadFixture(
+        deployPassiveIncome
+      );
+
+      expect(await passiveIncomeProperty.isActive()).to.equal(false);
+      await expect(
+        passiveIncomeProperty.connect(user).setActive()
+      ).to.be.revertedWith("Ownable: caller is not the owner");
+      expect(await passiveIncomeProperty.isActive()).to.equal(false);
+    });
+
+    it("Should correctly set startTime when activating a property", async function () {
+      const { owner, passiveIncomeProperty } = await loadFixture(
+        deployPassiveIncome
+      );
+
+      await passiveIncomeProperty.setActive();
+      const currentBlock = await ethers.provider.getBlock("latest");
+      expect(await passiveIncomeProperty.startTime()).to.equal(
+        currentBlock.timestamp
+      );
+    });
+
+    it("Full repayment of loan should deactivate payouts", async function () {
+      const { owner, user, passiveIncomeProperty, mockUSDT } =
+        await loadFixture(deployPassiveIncome);
+
+      // Mint 100k USDT for the owner and user
+      mockUSDT.connect(owner).faucet(100_000);
+      mockUSDT.connect(user).faucet(100_000);
+
+      // Approve USDT for the contract
+      await mockUSDT
+        .connect(owner)
+        .approve(
+          passiveIncomeProperty.address,
+          ethers.utils.parseUnits("100000", 6)
+        );
+
+      // Owner buys out the entire supply and activates payouts
+      await passiveIncomeProperty.mint(100);
+      await passiveIncomeProperty.setActive();
+
+      // Verify that payouts are active
+      expect(await passiveIncomeProperty.isActive()).to.equal(true);
+
+      // User pays off the entire loan amount
+      await mockUSDT
+        .connect(user)
+        .approve(
+          passiveIncomeProperty.address,
+          ethers.utils.parseUnits("100000", 6)
+        );
+      await passiveIncomeProperty.connect(user).repayLoan(100_000);
+
+      // Verify that payouts are now inactive
+      expect(await passiveIncomeProperty.isActive()).to.equal(false);
+    });
+
+    it("Partial repayment of loan shouldn't deactivate payouts but should reduce outstanding balance", async function () {
+      const { owner, user, passiveIncomeProperty, mockUSDT } =
+        await loadFixture(deployPassiveIncome);
+
+      // Mint 100k USDT for the owner and user
+      mockUSDT.connect(owner).faucet(100_000);
+      mockUSDT.connect(user).faucet(100_000);
+
+      // Approve USDT for the contract
+      await mockUSDT
+        .connect(owner)
+        .approve(
+          passiveIncomeProperty.address,
+          ethers.utils.parseUnits("100000", 6)
+        );
+
+      // Owner buys out the entire supply and activates payouts
+      await passiveIncomeProperty.mint(100);
+      await passiveIncomeProperty.setActive();
+
+      // Verify that payouts are active
+      expect(await passiveIncomeProperty.isActive()).to.equal(true);
+
+      // User pays off the entire loan amount
+      await mockUSDT
+        .connect(user)
+        .approve(
+          passiveIncomeProperty.address,
+          ethers.utils.parseUnits("50000", 6)
+        );
+      await passiveIncomeProperty.connect(user).repayLoan(50_000);
+
+      // Verify that payouts are still inactive and outstanding balance is 50k
+      expect(await passiveIncomeProperty.isActive()).to.equal(true);
+      expect(await passiveIncomeProperty.unpaidAmount()).to.equal(50_000);
+    });
+  });
 });

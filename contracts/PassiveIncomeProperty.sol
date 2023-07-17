@@ -84,4 +84,24 @@ contract PassiveIncomeProperty is ERC721, Ownable {
         require(isActive, "PassiveIncomeProperty: already inactive");
         isActive = false;
     }
+
+    function repayLoan(uint256 amount) external {
+        // Allows the user to repay their loan (in partial or in full)
+        require(amount <= unpaidAmount, "PassiveIncomeProperty: overpayment");
+        require(
+            paymentToken.transferFrom(
+                msg.sender,
+                address(this),
+                amount * 10 ** 6
+            ),
+            "PassiveIncomeProperty: repayment failed"
+        );
+
+        unpaidAmount -= amount;
+
+        if (unpaidAmount == 0) {
+            // Passive income stops after the loan has been fully paid
+            isActive = false;
+        }
+    }
 }

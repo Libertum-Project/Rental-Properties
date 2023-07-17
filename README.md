@@ -107,3 +107,17 @@ These functions can be called by a user (aided by the frontend) to claim their m
 9. **numCapitalRepaymentProperties** - this _view_ function returns the length of the `capitalRepaymentProperties` array which allows us to use the getter contained within that contract to iterate through the property array.
 
 10. **numPassiveIncomeProperties** - this _view_ function returns the length of the `passiveIncomeProperties` array which allows us to use the getter contained within that contract to iterate through the property array.
+
+### Admin Withdrawals
+
+Funds held on specific property contracts (via sale of NFTs) can be withdrawn using this function into a specified address.
+
+11. **withdrawFromCapitalRepaymentProperty** - this function transfers all funds held by the capital repayment property contract (of the designated `paymentTokenAddress`) into a specified wallet, it accepts two arguments:
+
+    - _address_ `from` - the address of the capital repayment property contract
+    - _address_ `to` - the specified destination of the funds held by the contract
+
+12. **withdrawFromPassiveIncomeProperty** - this function transfers all funds held by the passive income property contract (of the designated `paymentTokenAddress`) into a specified wallet, it accepts two arguments:
+
+    - _address_ `from` - the address of the passive income property contract
+    - _address_ `to` - the specified destination of the funds held by the contract

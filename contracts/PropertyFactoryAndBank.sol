@@ -35,4 +35,8 @@ contract PropertyFactoryAndBank is Ownable {
 
         return address(property);
     }
+
+    function numCapitalRepaymentProperties() external view returns (uint256) {
+        return capitalRepaymentProperties.length;
+    }
 }

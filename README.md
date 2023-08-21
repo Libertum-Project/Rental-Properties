@@ -32,6 +32,34 @@ npx hardhat run scripts/deploy.js --network localhost
 
 in order to deploy the contracts onto our local blockchain.
 
+## Deploying to Testnet
+
+To deploy a version of this contract to Polygon Mumbai, first create a file named `.env` in the root folder. This will store all the keys required for deployment. It should look like this (with the details filled in):
+
+```json
+POLYGONSCAN_API_KEY = "Create API Key on PolygonScan"
+ALCHEMY_API_KEY = "Create API Key on Alchemy"
+PRIVATE_KEY = "Private key for deploying EOA"
+```
+
+To deploy the contracts, run:
+
+```sh
+npx hardhat run scripts/deploy.js --network mumbai
+```
+
+After deployment, verify contracts using:
+
+```sh
+npx hardhat verify --network mumbai <CONTRACT_ADDRESS>
+```
+
+If there are any issues with verification, run this command:
+
+```sh
+npx hardhat clean
+```
+
 ## PropertyFactoryAndBank
 
 _onlyOwner_ denotes that the function can only be called by the deployer of the contract.

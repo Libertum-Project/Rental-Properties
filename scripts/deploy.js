@@ -14,6 +14,13 @@ async function main() {
     "Property Factory and Bank contract deployed to:",
     propertyFactoryAndBank.address
   );
+
+  const MockUSDT = await hre.ethers.getContractFactory("MockUSDT");
+  const mockUSDT = await MockUSDT.deploy();
+
+  await mockUSDT.deployed();
+
+  console.log("Mock USDT deployed to:", mockUSDT.address);
 }
 
 main()
